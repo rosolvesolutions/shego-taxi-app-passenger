@@ -1,11 +1,19 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 // placeholder file for now
 =======
 import express from 'express'
 import cors from 'cors'
+=======
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
+>>>>>>> 1a821bc (env for express server is set up)
 
 const app = express()
-const PORT = 3001
+const PORT = process.env.EXPRESS_SERVER_PORT;
 
 app.use(cors({ origin: 'http://localhost:19006' })) // only allow Expo Web
 
