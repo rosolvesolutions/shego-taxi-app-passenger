@@ -1,0 +1,15 @@
+# Ignore node_modules everywhere
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Logs
+*.log
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
