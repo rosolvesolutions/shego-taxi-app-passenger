@@ -27,4 +27,4 @@ app.use('/api/passenger', passengerRoutes)
 app.listen(PORT, () => {
   console.log(`✅ Server running at ${process.env.EXPRESS_SERVER_IP}:${PORT}`)
 })
->>>>>>> 5b6e47c (Express server is added and working!)
+
