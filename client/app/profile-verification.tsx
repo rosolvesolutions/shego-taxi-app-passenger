@@ -68,7 +68,7 @@ export default function ProfileVerification(): JSX.Element {
 
       <TouchableOpacity style={styles.verifyButton} onPress={launchCamera}>
         <Text style={styles.verifyText}>Verify with ID card</Text>
-        <Image source={require(camera)} style={styles.cameraIcon} />
+        <Image source={camera} style={styles.cameraIcon} />
       </TouchableOpacity>
 
       <Text style={styles.noteText}>

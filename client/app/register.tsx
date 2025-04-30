@@ -13,8 +13,8 @@ import { router } from 'expo-router'
 import * as Google from 'expo-auth-session/providers/google'
 import * as Facebook from 'expo-auth-session/providers/facebook'
 import * as WebBrowser from 'expo-web-browser'
-import google from '../../assets/images/google.png'
-import facebook from '../../assets/images/facebook.png'
+import googleIcon from '../../assets/images/google.png'
+import facebookIcon from '../../assets/images/facebook.png'
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -141,14 +141,14 @@ export default function RegisterPage(): JSX.Element {
 
       <TouchableOpacity style={styles.oauthButton} onPress={() => promptGoogle()}>
         <View style={styles.oauthContent}>
-          <Image source={require(google)} style={styles.oauthIcon} />
+          <Image source={googleIcon} style={styles.oauthIcon} />
           <Text style={styles.oauthText}>Log in with Google</Text>
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.oauthButton} onPress={() => promptFacebook()}>
         <View style={styles.oauthContent}>
-          <Image source={require(facebook)} style={styles.oauthIcon} />
+          <Image source={facebookIcon} style={styles.oauthIcon} />
           <Text style={styles.oauthText}>Log in with Facebook</Text>
         </View>
       </TouchableOpacity>
