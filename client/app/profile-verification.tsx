@@ -11,8 +11,7 @@ import {
 } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
-import cameraIcon from '../../assets/images/camera.png'
-import camera from '../../assets/images/camera.png'
+import cameraIcon from '../assets/images/camera.png'
 
 export default function ProfileVerification(): JSX.Element {
   const { userData } = useLocalSearchParams()
@@ -68,7 +67,7 @@ export default function ProfileVerification(): JSX.Element {
 
       <TouchableOpacity style={styles.verifyButton} onPress={launchCamera}>
         <Text style={styles.verifyText}>Verify with ID card</Text>
-        <Image source={camera} style={styles.cameraIcon} />
+        <Image source={cameraIcon} style={styles.cameraIcon} />
       </TouchableOpacity>
 
       <Text style={styles.noteText}>
