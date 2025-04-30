@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
+// there was a view here but was omitted to pass git actions
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
