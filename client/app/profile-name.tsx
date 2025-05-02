@@ -58,7 +58,7 @@ export default function ProfileNameScreen() {
             text: 'OK',
             onPress: () => {
               router.push({
-                pathname: '/passenger-side/profile-verification',
+                pathname: '/profile-verification',
                 params: {
                   userData: JSON.stringify(userData),
                 },

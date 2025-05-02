@@ -13,8 +13,8 @@ import { router } from 'expo-router'
 import * as Google from 'expo-auth-session/providers/google'
 import * as Facebook from 'expo-auth-session/providers/facebook'
 import * as WebBrowser from 'expo-web-browser'
-import googleIcon from '../assets/images/google.png'
-import facebookIcon from '../assets/images/facebook.png'
+import googleIcon from '/assets/images/google.png'
+import facebookIcon from '/assets/images/facebook.png'
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -50,7 +50,7 @@ export default function RegisterPage(): JSX.Element {
   const handleCreateAccount = () => {
     if (isPhoneValid(phoneNumber)) {
       router.push({
-        pathname: '/passenger-side/profile-name',
+        pathname: '/profile-name',
         params: {
           phoneNumber,
         },
