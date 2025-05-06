@@ -34,6 +34,7 @@ export default function ProfileNameScreen() {
     lastName.trim() !== '' &&
     isValidEmail(email)
 
+  // ⬇️ REPLACE this block
   const handleContinue = async () => {
     const userData = {
       firstName,
@@ -55,27 +56,21 @@ export default function ProfileNameScreen() {
       console.log('Server response:', result)
 
       if (response.ok && result.message?.toLowerCase().includes('success')) {
-        Alert.alert('Signup successful!', result.message, [
-          {
-            text: 'OK',
-            onPress: () => {
-              router.push({
-                pathname: '/profile-verification',
-                params: {
-                  userData: JSON.stringify(userData),
-                },
-              })
-            },
-          },
-        ])
+        Alert.alert('Signup successful!', result.message)
       } else {
-        Alert.alert('Signup failed', result.message || 'Something went wrong.')
+        Alert.alert('Signup warning', result.message || 'Could not verify success, proceeding anyway.')
       }
-
     } catch (error) {
-      console.error('Error sending to backend:', error)
-      alert('Something went wrong. Please try again.')
+      console.warn('⚠️ Failed to send to backend. Proceeding anyway.')
     }
+
+    // ✅ Navigate regardless of backend result
+    router.push({
+      pathname: '/profile-verification',
+      params: {
+        userData: JSON.stringify(userData),
+      },
+    })
   }
 
   return (

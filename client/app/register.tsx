@@ -79,6 +79,7 @@ export default function RegisterPage(): JSX.Element {
         params: { firstName: first, lastName: last, phoneNumber },
       })
     } catch (error) {
+      console.error(error)
       alert('Google login failed.')
     }
   }
@@ -100,6 +101,7 @@ export default function RegisterPage(): JSX.Element {
         params: { firstName: first, lastName: last, phoneNumber },
       })
     } catch (error) {
+      console.error(error)
       alert('Facebook login failed.')
     }
   }
