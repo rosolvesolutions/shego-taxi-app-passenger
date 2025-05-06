@@ -4,17 +4,37 @@ import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 import { defineConfig } from "eslint/config";
 
-
 export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"], plugins: { js }, extends: ["js/recommended"] },
-  { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"], languageOptions: { globals: globals.node } },
+  // ✅ Ignore compiled output like /dist
+  {
+    ignores: ["**/dist/**"],
+  },
+  {
+    files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+    plugins: { js },
+    extends: ["js/recommended"],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   tseslint.configs.recommended,
   {
     ...pluginReact.configs.flat.recommended,
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    settings: {
+      react: {
+        version: "detect", // ✅ Fix warning: React version not specified
+      },
+    },
     rules: {
       ...pluginReact.configs.flat.recommended.rules,
-      // Disable the rule that requires `React` in scope
-      "react/react-in-jsx-scope": "off",
+      "react/react-in-jsx-scope": "off", // ✅ For Next.js/Expo etc.
     },
   },
 ]);
