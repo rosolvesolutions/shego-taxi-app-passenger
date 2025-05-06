@@ -61,6 +61,7 @@ export default function ProfileNameScreen() {
         Alert.alert('Signup warning', result.message || 'Could not verify success, proceeding anyway.')
       }
     } catch (error) {
+      console.error(error)
       console.warn('⚠️ Failed to send to backend. Proceeding anyway.')
     }
 
