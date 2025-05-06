@@ -7,7 +7,6 @@ import {
 } from 'react-native'
 import { router } from 'expo-router'
 
-// ✅ Use environment variable or fallback to localhost
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001'
 
 export default function UserSelectionPage() {

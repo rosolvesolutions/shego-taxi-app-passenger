@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-// there was a view here but was omitted to pass git actions
 import {
   Text,
   TextInput,
@@ -11,6 +10,9 @@ import {
   ScrollView,
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
+
+// ✅ Load API URL from environment
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001'
 
 export default function ProfileNameScreen() {
   const {
@@ -41,7 +43,7 @@ export default function ProfileNameScreen() {
     }
 
     try {
-      const response = await fetch('http://192.168.56.1:5001/api/passenger/register', {
+      const response = await fetch(`${API_URL}/api/passenger/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +71,7 @@ export default function ProfileNameScreen() {
       } else {
         Alert.alert('Signup failed', result.message || 'Something went wrong.')
       }
-      
+
     } catch (error) {
       console.error('Error sending to backend:', error)
       alert('Something went wrong. Please try again.')
