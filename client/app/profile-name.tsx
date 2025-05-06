@@ -41,7 +41,7 @@ export default function ProfileNameScreen() {
     }
 
     try {
-      const response = await fetch('http://10.156.26.109:5001/api/passenger/register', {
+      const response = await fetch('http://192.168.56.1:5001/api/passenger/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

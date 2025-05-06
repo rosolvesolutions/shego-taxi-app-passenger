@@ -23,5 +23,5 @@ app.get('/api/value', (req, res) => {
 // Driver registration routes
 app.use('/api/passenger', passenger_1.default);
 app.listen(PORT, () => {
-    console.log(`✅ Server running at ${process.env.EXPRESS_SERVER_IP}:${PORT}`);
+    console.log(`✅ Server running at ${process.env.EXPRESS_SERVER_IP}:${PORT}!`);
 });

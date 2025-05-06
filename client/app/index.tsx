@@ -7,13 +7,16 @@ import {
 } from 'react-native'
 import { router } from 'expo-router'
 
+// ✅ Use environment variable or fallback to localhost
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001'
+
 export default function UserSelectionPage() {
   const [fetchedValue, setFetchedValue] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchValue = async () => {
       try {
-        const response = await fetch('http://172.20.10.2:5001/api/value')
+        const response = await fetch(`${API_URL}/api/value`)
         const data = await response.json()
         setFetchedValue(data.value)
       } catch (error) {
@@ -56,7 +59,6 @@ export default function UserSelectionPage() {
           </Text>
         </TouchableOpacity>
 
-
         <Text style={styles.linkText}>
           need an account for both?{' '}
           <Text style={styles.clickable}>click here</Text>
@@ -76,6 +78,7 @@ export default function UserSelectionPage() {
     </View>
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {

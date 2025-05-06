@@ -14,9 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // server/src/config/db.ts
 const mongoose_1 = __importDefault(require("mongoose"));
+const path_1 = __importDefault(require("path"));
+const dotenv_1 = __importDefault(require("dotenv"));
+// Load environment variables from .env file
+dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../../.env') });
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect('mongodb://admin:password@10.156.26.109:27017/taxi');
+        yield mongoose_1.default.connect(`${process.env.MONGODB_CONNECTION_STRING}`);
         console.log('✅ MongoDB connected');
     }
     catch (err) {
