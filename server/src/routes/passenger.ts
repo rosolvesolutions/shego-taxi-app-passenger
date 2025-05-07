@@ -3,9 +3,6 @@ import Passenger from '../models/Passenger'
 
 const router = express.Router()
 
-// Simple numeric ID counter (replace with a real counter in production)
-let nextPassengerId = 1
-
 router.post('/register', async (req, res) => {
   console.log(req.body);
   try {
@@ -17,7 +14,6 @@ router.post('/register', async (req, res) => {
     } = req.body
 
     const newPassenger = new Passenger({
-      _id: nextPassengerId++, // Numeric ID instead of ObjectId
       phoneNumber,
       firstName,
       lastName,
