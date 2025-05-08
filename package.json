@@ -26,5 +26,8 @@
     "bugs": {
         "url": "https://github.com/rosolvesolutions/shego-taxi-app-driver/issues"
     },
-    "homepage": "https://github.com/rosolvesolutions/shego-taxi-app-driver#readme"
+    "homepage": "https://github.com/rosolvesolutions/shego-taxi-app-driver#readme",
+    "dependencies": {
+        "expo": "^53.0.8"
+    }
 }

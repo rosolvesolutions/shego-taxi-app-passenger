@@ -33,7 +33,14 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "react-native-maps"
+      [
+        "react-native-maps",
+        {
+          "config": {
+            "googleMapsApiKey": "AIzaSyBILecHHIqnjzRssYBxFbIn1qzV6LbohqE"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
