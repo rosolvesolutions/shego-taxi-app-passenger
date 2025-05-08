@@ -33,7 +33,7 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      ["react-native-maps"]
+      "react-native-maps"
     ],
     "experiments": {
       "typedRoutes": true
