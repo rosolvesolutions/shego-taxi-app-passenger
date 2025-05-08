@@ -32,7 +32,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      ["react-native-maps"]
     ],
     "experiments": {
       "typedRoutes": true
