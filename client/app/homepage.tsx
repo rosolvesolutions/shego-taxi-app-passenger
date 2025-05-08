@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useRef } from 'react';
 import { router } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Image, SafeAreaView, TextInput} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, /*Image*/ SafeAreaView, TextInput} from 'react-native'; // commented Image out to pass the check
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Animated, Pressable } from 'react-native';
 import { useEffect } from 'react';
@@ -21,9 +21,11 @@ export default function HomePage() {
   //Toggle Menu 
   const [menuVisible, setMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-250)).current; // start off-screen
-  const toggleMenu = () => {
+  
+  // commented out to pass the workflow action
+  /*const toggleMenu = () => {
       setMenuVisible(!menuVisible);
-  };
+  };*/
   const openMenu = () => {
     console.log('Opening menu....')
     setMenuVisible(true);
@@ -58,7 +60,7 @@ export default function HomePage() {
 
   // State for tracking user's current location
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [/*errorMsg*/, setErrorMsg] = useState<string | null>(null);
 
 
   useEffect(() => {
