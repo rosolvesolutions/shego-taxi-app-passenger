@@ -1,7 +1,6 @@
 import mongoose from 'mongoose'
 
-const passengerSchema = new mongoose.Schema({
-  _id: Number, 
+const passengerSchema = new mongoose.Schema({ 
   phoneNumber: String,
   firstName: String,
   lastName: String,

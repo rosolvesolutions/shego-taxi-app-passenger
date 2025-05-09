@@ -21,14 +21,15 @@ WebBrowser.maybeCompleteAuthSession()
 export default function RegisterPage(): JSX.Element {
   const [phoneNumber, setPhoneNumber] = useState<string>('')
 
-  //there was googleRequest here but was omitted to pass git actions
   const [, googleResponse, promptGoogle] = Google.useAuthRequest({
-    expoClientId: 'YOUR_EXPO_CLIENT_ID.apps.googleusercontent.com',
-    iosClientId: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com',
-    androidClientId: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com',
+    expoClientId: '73401594138-9ok57i91m84qpmka3l3b88ujvg4r38h4.apps.googleusercontent.com',
+    iosClientId: '<your-ios-client-id>',
+    androidClientId: '<your-android-client-id>',
+    webClientId: '73401594138-bimcri6eg34klc2v3hiobmqdvu2el671.apps.googleusercontent.com',
+    responseType: 'id_token',
+    scopes: ['profile', 'email'],
   })
 
-  //there was fbRequest here but was omitted to pass git actions
   const [, fbResponse, promptFacebook] = Facebook.useAuthRequest({
     clientId: 'YOUR_FACEBOOK_APP_ID',
   })
@@ -50,67 +51,72 @@ export default function RegisterPage(): JSX.Element {
   const handleCreateAccount = () => {
     if (isPhoneValid(phoneNumber)) {
       router.push({
-        pathname: '/passenger-side/profile-name',
-        params: {
-          phoneNumber,
-        },
+        pathname: '/profile-name',
+        params: { phoneNumber },
       })
     } else {
       alert('Please enter a valid Irish mobile number')
     }
   }
 
+  const handleGoogleLogin = async () => {
+    if (!isPhoneValid(phoneNumber)) {
+      alert('Please enter a valid Irish phone number before logging in with Google.')
+      return
+    }
+
+    try {
+      const res = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          Authorization: `Bearer ${googleResponse?.authentication?.accessToken}`,
+        },
+      })
+      const user = await res.json()
+      const [first, last] = user.name.split(' ')
+
+      router.push({
+        pathname: '/passenger-side/profile-name',
+        params: { firstName: first, lastName: last, phoneNumber },
+      })
+    } catch (error) {
+      console.error(error)
+      alert('Google login failed.')
+    }
+  }
+
+  const handleFacebookLogin = async () => {
+    if (!isPhoneValid(phoneNumber)) {
+      alert('Please enter a valid Irish phone number before logging in with Facebook.')
+      return
+    }
+
+    try {
+      const token = fbResponse?.authentication?.accessToken
+      const res = await fetch(`https://graph.facebook.com/me?fields=name&access_token=${token}`)
+      const user = await res.json()
+      const [first, last] = user.name.split(' ')
+
+      router.push({
+        pathname: '/passenger-side/profile-name',
+        params: { firstName: first, lastName: last, phoneNumber },
+      })
+    } catch (error) {
+      console.error(error)
+      alert('Facebook login failed.')
+    }
+  }
+
   useEffect(() => {
-    const handleGoogleLogin = async () => {
-      if (googleResponse?.type === 'success') {
-        if (!isPhoneValid(phoneNumber)) {
-          alert('Please enter a valid Irish phone number before logging in with Google.')
-          return
-        }
-
-        const res = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-          headers: { Authorization: `Bearer ${googleResponse.authentication?.accessToken}` },
-        })
-        const user = await res.json()
-        const [first, last] = user.name.split(' ')
-
-        router.push({
-          pathname: '/passenger-side/profile-name',
-          params: {
-            firstName: first,
-            lastName: last,
-            phoneNumber,
-          },
-        })
-      }
+    if (googleResponse?.type === 'success') {
+      handleGoogleLogin()
     }
+  }, [googleResponse])
 
-    const handleFacebookLogin = async () => {
-      if (fbResponse?.type === 'success') {
-        if (!isPhoneValid(phoneNumber)) {
-          alert('Please enter a valid Irish phone number before logging in with Facebook.')
-          return
-        }
-
-        const token = fbResponse.authentication?.accessToken
-        const res = await fetch(`https://graph.facebook.com/me?fields=name&access_token=${token}`)
-        const user = await res.json()
-        const [first, last] = user.name.split(' ')
-
-        router.push({
-          pathname: '/passenger-side/profile-name',
-          params: {
-            firstName: first,
-            lastName: last,
-            phoneNumber,
-          },
-        })
-      }
+  useEffect(() => {
+    if (fbResponse?.type === 'success') {
+      handleFacebookLogin()
     }
-
-    handleGoogleLogin()
-    handleFacebookLogin()
-  }, [googleResponse, fbResponse])
+  }, [fbResponse])
 
   return (
     <View style={styles.container}>
@@ -139,7 +145,13 @@ export default function RegisterPage(): JSX.Element {
 
       <Text style={styles.orText}>OR</Text>
 
-      <TouchableOpacity style={styles.oauthButton} onPress={() => promptGoogle()}>
+      <TouchableOpacity
+        style={styles.oauthButton}
+        onPress={() => {
+          if (promptGoogle) promptGoogle()
+          else alert('Google login is not ready yet.')
+        }}
+      >
         <View style={styles.oauthContent}>
           <Image source={googleIcon} style={styles.oauthIcon} />
           <Text style={styles.oauthText}>Log in with Google</Text>

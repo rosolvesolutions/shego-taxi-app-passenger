@@ -25,6 +25,6 @@ app.get('/api/value', (req, res) => {
 app.use('/api/passenger', passengerRoutes)
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running at ${process.env.EXPRESS_SERVER_IP}:${PORT}`)
+  console.log(`✅ Server running at ${process.env.EXPRESS_SERVER_IP}:${PORT}!`)
 })
 
