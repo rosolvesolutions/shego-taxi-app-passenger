@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  ScrollView,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 
@@ -31,40 +31,36 @@ export default function UserSelectionPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Header Section */}
-        <View style={styles.topSection}>
-          <View style={styles.logoPlaceholder}>
-            <Text style={styles.logoText}>SheGo</Text>
-          </View>
+      {/* Top Section */}
+      <View style={styles.topSection}>
+        <View style={styles.logoPlaceholder}>
+          <Text style={styles.logoText}>SheGo</Text>
         </View>
+        <Text style={styles.heading}>Welcome to SheGo</Text>
+        <Text style={styles.subheading}>Your safe and empowering ride awaits.</Text>
+      </View>
 
-        {/* Main Content */}
-        <View style={styles.content}>
-          <Text style={styles.heading}>Welcome to SheGo</Text>
-          <Text style={styles.subheading}>Your safe and empowering ride awaits.</Text>
+      {/* Start Button */}
+      <View style={styles.middleSection}>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => router.push('/register')}
+        >
+          <Text style={styles.startText}>Start</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={() => router.push('/register')}
-          >
-            <Text style={styles.startText}>Start</Text>
-          </TouchableOpacity>
+        {fetchedValue && (
+          <Text style={styles.backendStatus}>{fetchedValue}</Text>
+        )}
+      </View>
 
-          {fetchedValue && (
-            <Text style={styles.backendStatus}>{fetchedValue}</Text>
-          )}
-        </View>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.termsTitle}>Terms & Conditions</Text>
-          <Text style={styles.termsText}>
-            By continuing, you agree to our Terms of Service and Privacy Policy.
-            SheGo is operated by Rosolve Ltd. All rights reserved.
-          </Text>
-        </View>
-      </ScrollView>
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          By continuing, you agree to our Terms & Conditions and Privacy Policy.
+          {'\n'}© Rosolve Ltd.
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -72,56 +68,49 @@ export default function UserSelectionPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  scrollContainer: {
-    flexGrow: 1,
     backgroundColor: '#fff',
+    justifyContent: 'space-between',
   },
   topSection: {
-    backgroundColor: '#9E2A45',
+    paddingTop: 60,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 80,
-    paddingBottom: 40,
   },
   logoPlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#fff',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: '#D3D3D3',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
+    marginBottom: 20,
   },
   logoText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#9E2A45',
-  },
-  content: {
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
   },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 12,
-    color: '#222',
+    color: '#333',
+    marginBottom: 8,
   },
   subheading: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 30,
+    marginBottom: 20,
     textAlign: 'center',
+    paddingHorizontal: 30,
+  },
+  middleSection: {
+    alignItems: 'center',
   },
   startButton: {
     backgroundColor: '#C73A53',
     paddingVertical: 16,
-    paddingHorizontal: 40,
+    paddingHorizontal: 60,
     borderRadius: 30,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   startText: {
     color: '#fff',
@@ -131,25 +120,21 @@ const styles = StyleSheet.create({
   backendStatus: {
     fontSize: 13,
     color: '#9E2A45',
-    marginTop: 10,
+    marginTop: 6,
     fontWeight: '500',
   },
   footer: {
-    borderTopWidth: 1,
-    borderColor: '#eee',
-    padding: 24,
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     backgroundColor: '#f9f9f9',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
   },
-  termsTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 6,
-  },
-  termsText: {
+  footerText: {
     fontSize: 12,
-    color: '#666',
-    lineHeight: 18,
+    color: '#999',
     textAlign: 'center',
+    lineHeight: 18,
   },
 });
