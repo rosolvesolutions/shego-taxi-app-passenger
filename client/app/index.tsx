@@ -38,30 +38,14 @@ export default function UserSelectionPage() {
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={styles.heading}>Create your account now!</Text>
+        <Text style={styles.heading}>Welcome to SheGo!</Text>
 
         <TouchableOpacity
           style={styles.selectionButton}
           onPress={() => router.push('/register')}
         >
-          <Text style={styles.buttonText}>
-            I&apos;m a <Text style={styles.bold}>Passenger</Text>
-          </Text>
+          <Text style={styles.buttonText}>Start</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.selectionButton}
-          onPress={() => router.push('./diver-side/driver-registration')}
-        >
-          <Text style={styles.buttonText}>
-            I&apos;m a <Text style={styles.bold}>Driver</Text>
-          </Text>
-        </TouchableOpacity>
-
-        <Text style={styles.linkText}>
-          need an account for both?{' '}
-          <Text style={styles.clickable}>click here</Text>
-        </Text>
 
         <View style={styles.divider} />
 
@@ -77,7 +61,6 @@ export default function UserSelectionPage() {
     </View>
   )
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -110,7 +93,7 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   heading: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 30,
   },
@@ -124,19 +107,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
+    fontWeight: 'bold',
     color: '#000',
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
-  linkText: {
-    fontSize: 13,
-    color: '#444',
-    marginTop: 12,
-  },
-  clickable: {
-    textDecorationLine: 'underline',
-    fontWeight: 'bold',
   },
   divider: {
     height: 1,
