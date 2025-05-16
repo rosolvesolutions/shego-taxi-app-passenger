@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Text,
   TextInput,
@@ -8,40 +8,39 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from 'react-native'
-import { router, useLocalSearchParams } from 'expo-router'
+  View,
+} from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 
-// ✅ Load API URL from environment
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001'
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001';
 
 export default function ProfileNameScreen() {
   const {
     firstName: paramFirstName = '',
     lastName: paramLastName = '',
     phoneNumber: paramPhoneNumber = '',
-  } = useLocalSearchParams()
+  } = useLocalSearchParams();
 
-  const [firstName, setFirstName] = useState(paramFirstName)
-  const [lastName, setLastName] = useState(paramLastName)
-  const [email, setEmail] = useState('')
-  const phoneNumber = paramPhoneNumber
+  const [firstName, setFirstName] = useState(paramFirstName);
+  const [lastName, setLastName] = useState(paramLastName);
+  const [email, setEmail] = useState('');
+  const phoneNumber = paramPhoneNumber;
 
   const isValidEmail = (email: string) =>
-    /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email)
+    /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
 
   const isFormValid =
     firstName.trim() !== '' &&
     lastName.trim() !== '' &&
-    isValidEmail(email)
+    isValidEmail(email);
 
-  // ⬇️ REPLACE this block
   const handleContinue = async () => {
     const userData = {
       firstName,
       lastName,
       email,
       phoneNumber,
-    }
+    };
 
     try {
       const response = await fetch(`${API_URL}/api/passenger/register`, {
@@ -50,29 +49,31 @@ export default function ProfileNameScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
-      })
+      });
 
-      const result = await response.json()
-      console.log('Server response:', result)
+      const result = await response.json();
+      console.log('Server response:', result);
 
       if (response.ok && result.message?.toLowerCase().includes('success')) {
-        Alert.alert('Signup successful!', result.message)
+        Alert.alert('Signup successful!', result.message);
       } else {
-        Alert.alert('Signup warning', result.message || 'Could not verify success, proceeding anyway.')
+        Alert.alert(
+          'Signup warning',
+          result.message || 'Could not verify success, proceeding anyway.'
+        );
       }
     } catch (error) {
-      console.error(error)
-      console.warn('⚠️ Failed to send to backend. Proceeding anyway.')
+      console.error(error);
+      console.warn('⚠️ Failed to send to backend. Proceeding anyway.');
     }
 
-    // ✅ Navigate regardless of backend result
     router.push({
       pathname: '/profile-verification',
       params: {
         userData: JSON.stringify(userData),
       },
-    })
-  }
+    });
+  };
 
   return (
     <KeyboardAvoidingView
@@ -81,82 +82,99 @@ export default function ProfileNameScreen() {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.heading}>
-          Thank you for signing up!{'\n'}
-          <Text style={styles.bold}>Please tell us your name to continue.</Text>
-        </Text>
+        <View style={styles.wrapper}>
+          <Text style={styles.heading}>Welcome to SheGo 🎉</Text>
+          <Text style={styles.subheading}>
+            Please enter your details to complete your profile.
+          </Text>
 
-        <Text style={styles.label}>Your first name:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Jane"
-          value={firstName}
-          onChangeText={setFirstName}
-        />
+          <Text style={styles.label}>First name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Jane"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
 
-        <Text style={styles.label}>Your last name:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Doe"
-          value={lastName}
-          onChangeText={setLastName}
-        />
+          <Text style={styles.label}>Last name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Doe"
+            value={lastName}
+            onChangeText={setLastName}
+          />
 
-        <Text style={styles.label}>Your email (Gmail only):</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="example@gmail.com"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+          <Text style={styles.label}>Email (Gmail only)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="example@gmail.com"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-        <TouchableOpacity
-          style={[styles.continueButton, !isFormValid && styles.disabledButton]}
-          onPress={handleContinue}
-          disabled={!isFormValid}
-        >
-          <Text style={styles.continueText}>Continue</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.continueButton,
+              !isFormValid && styles.disabledButton,
+            ]}
+            onPress={handleContinue}
+            disabled={!isFormValid}
+          >
+            <Text style={styles.continueText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.footer}>
-          All data collected is stored privately and only used to protect the safety of you and others. © Team Rosolve.
+          All personal data is processed in line with GDPR and privacy best
+          practices. By continuing, you agree to our Terms and Privacy Policy.
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     backgroundColor: '#fff',
-    padding: 24,
     justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  wrapper: {
+    paddingTop: 40,
   },
   heading: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  bold: {
+    fontSize: 22,
     fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+    color: '#222',
+  },
+  subheading: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#555',
+    marginBottom: 30,
   },
   label: {
     fontSize: 14,
-    marginBottom: 8,
-    marginTop: 12,
+    marginBottom: 6,
+    marginTop: 14,
+    color: '#333',
   },
   input: {
-    backgroundColor: '#E6E6E6',
+    backgroundColor: '#F0F0F0',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     fontSize: 16,
+    color: '#000',
   },
   continueButton: {
-    marginTop: 28,
+    marginTop: 32,
     backgroundColor: '#C73A53',
     paddingVertical: 16,
     borderRadius: 12,
@@ -171,10 +189,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   footer: {
-    fontSize: 11,
-    color: '#666',
+    fontSize: 12,
+    color: '#888',
     textAlign: 'center',
     marginTop: 40,
-    marginBottom: 20,
+    paddingHorizontal: 12,
+    lineHeight: 18,
   },
-})
+});
