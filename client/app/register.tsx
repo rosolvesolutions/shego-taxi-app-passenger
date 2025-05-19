@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,18 @@ import {
   Image,
   TextStyle,
   ViewStyle,
-} from 'react-native'
-import { router } from 'expo-router'
-import * as Google from 'expo-auth-session/providers/google'
-import * as Facebook from 'expo-auth-session/providers/facebook'
-import * as WebBrowser from 'expo-web-browser'
-import googleIcon from '../assets/images/google.png'
-import facebookIcon from '../assets/images/facebook.png'
+} from 'react-native';
+import { router } from 'expo-router';
+import * as Google from 'expo-auth-session/providers/google';
+import * as Facebook from 'expo-auth-session/providers/facebook';
+import * as WebBrowser from 'expo-web-browser';
+import googleIcon from '../assets/images/google.png';
+import facebookIcon from '../assets/images/facebook.png';
 
-WebBrowser.maybeCompleteAuthSession()
+WebBrowser.maybeCompleteAuthSession();
 
 export default function RegisterPage(): JSX.Element {
-  const [phoneNumber, setPhoneNumber] = useState<string>('')
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
 
   const [, googleResponse, promptGoogle] = Google.useAuthRequest({
     expoClientId: '73401594138-9ok57i91m84qpmka3l3b88ujvg4r38h4.apps.googleusercontent.com',
@@ -28,41 +28,41 @@ export default function RegisterPage(): JSX.Element {
     webClientId: '73401594138-bimcri6eg34klc2v3hiobmqdvu2el671.apps.googleusercontent.com',
     responseType: 'id_token',
     scopes: ['profile', 'email'],
-  })
+  });
 
   const [, fbResponse, promptFacebook] = Facebook.useAuthRequest({
     clientId: 'YOUR_FACEBOOK_APP_ID',
-  })
+  });
 
   const handlePhoneInput = (text: string) => {
-    const digitsOnly = text.replace(/[^0-9]/g, '')
-    setPhoneNumber(digitsOnly)
-  }
+    const digitsOnly = text.replace(/[^0-9]/g, '');
+    setPhoneNumber(digitsOnly);
+  };
 
   const isPhoneValid = (number: string) => {
-    let formatted = number
+    let formatted = number;
     if (formatted.startsWith('0')) {
-      formatted = formatted.substring(1)
+      formatted = formatted.substring(1);
     }
-    const irishPhoneRegex = /^8[3-9][0-9]{7}$/
-    return irishPhoneRegex.test(formatted)
-  }
+    const irishPhoneRegex = /^8[3-9][0-9]{7}$/;
+    return irishPhoneRegex.test(formatted);
+  };
 
   const handleCreateAccount = () => {
     if (isPhoneValid(phoneNumber)) {
       router.push({
         pathname: '/profile-name',
         params: { phoneNumber },
-      })
+      });
     } else {
-      alert('Please enter a valid Irish mobile number')
+      alert('Please enter a valid Irish mobile number');
     }
-  }
+  };
 
   const handleGoogleLogin = async () => {
     if (!isPhoneValid(phoneNumber)) {
-      alert('Please enter a valid Irish phone number before logging in with Google.')
-      return
+      alert('Please enter a valid Irish phone number before logging in with Google.');
+      return;
     }
 
     try {
@@ -70,61 +70,67 @@ export default function RegisterPage(): JSX.Element {
         headers: {
           Authorization: `Bearer ${googleResponse?.authentication?.accessToken}`,
         },
-      })
-      const user = await res.json()
-      const [first, last] = user.name.split(' ')
+      });
+      const user = await res.json();
+      const [first, last] = user.name.split(' ');
 
       router.push({
         pathname: '/passenger-side/profile-name',
         params: { firstName: first, lastName: last, phoneNumber },
-      })
+      });
     } catch (error) {
-      console.error(error)
-      alert('Google login failed.')
+      console.error(error);
+      alert('Google login failed.');
     }
-  }
+  };
 
   const handleFacebookLogin = async () => {
     if (!isPhoneValid(phoneNumber)) {
-      alert('Please enter a valid Irish phone number before logging in with Facebook.')
-      return
+      alert('Please enter a valid Irish phone number before logging in with Facebook.');
+      return;
     }
 
     try {
-      const token = fbResponse?.authentication?.accessToken
-      const res = await fetch(`https://graph.facebook.com/me?fields=name&access_token=${token}`)
-      const user = await res.json()
-      const [first, last] = user.name.split(' ')
+      const token = fbResponse?.authentication?.accessToken;
+      const res = await fetch(`https://graph.facebook.com/me?fields=name&access_token=${token}`);
+      const user = await res.json();
+      const [first, last] = user.name.split(' ');
 
       router.push({
         pathname: '/passenger-side/profile-name',
         params: { firstName: first, lastName: last, phoneNumber },
-      })
+      });
     } catch (error) {
-      console.error(error)
-      alert('Facebook login failed.')
+      console.error(error);
+      alert('Facebook login failed.');
     }
-  }
+  };
 
   useEffect(() => {
     if (googleResponse?.type === 'success') {
-      handleGoogleLogin()
+      handleGoogleLogin();
     }
-  }, [googleResponse])
+  }, [googleResponse]);
 
   useEffect(() => {
     if (fbResponse?.type === 'success') {
-      handleFacebookLogin()
+      handleFacebookLogin();
     }
-  }, [fbResponse])
+  }, [fbResponse]);
 
   return (
     <View style={styles.container}>
       <View style={styles.logoPlaceholder}>
-        <Text style={styles.logoText}>Logo</Text>
+        <Text style={styles.logoText}>SheGo</Text>
       </View>
 
-      <Text style={styles.title}>Enter your number here</Text>
+      <Text style={styles.title}>Create your SheGo account</Text>
+
+      <View style={styles.subtitleWrapper}>
+        <Text style={styles.subtitle}>
+          Enter your Irish mobile number or sign in using Google or Facebook to continue.
+        </Text>
+      </View>
 
       <View style={styles.phoneInputContainer}>
         <View style={styles.countryCode}>
@@ -148,8 +154,8 @@ export default function RegisterPage(): JSX.Element {
       <TouchableOpacity
         style={styles.oauthButton}
         onPress={() => {
-          if (promptGoogle) promptGoogle()
-          else alert('Google login is not ready yet.')
+          if (promptGoogle) promptGoogle();
+          else alert('Google login is not ready yet.');
         }}
       >
         <View style={styles.oauthContent}>
@@ -166,15 +172,15 @@ export default function RegisterPage(): JSX.Element {
       </TouchableOpacity>
 
       <Text style={styles.footerText}>
-        Terms & Conditions apply. Lorem ipsum etc etc etc. Copyright Rooslove Ltd.
+        Terms & Conditions apply. By continuing, you agree to our Privacy Policy and User Agreement.
       </Text>
     </View>
-  )
+  );
 }
 
 type Style = {
-  [key: string]: ViewStyle | TextStyle
-}
+  [key: string]: ViewStyle | TextStyle;
+};
 
 const styles = StyleSheet.create<Style>({
   container: {
@@ -182,25 +188,37 @@ const styles = StyleSheet.create<Style>({
     backgroundColor: '#fff',
     alignItems: 'center',
     paddingTop: 60,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   logoPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: '#D3D3D3',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
+    elevation: 4,
   },
   logoText: {
-    fontSize: 12,
-    color: '#555',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#9E2A45',
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#333',
+    marginBottom: 8,
+  },
+  subtitleWrapper: {
+    marginBottom: 28,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   phoneInputContainer: {
     flexDirection: 'row',
@@ -208,24 +226,28 @@ const styles = StyleSheet.create<Style>({
     marginBottom: 20,
   },
   countryCode: {
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#F5F5F5',
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
     justifyContent: 'center',
+    borderRightWidth: 1,
+    borderRightColor: '#ddd',
   },
   countryText: {
     fontSize: 16,
+    color: '#333',
   },
   phoneInput: {
     flex: 1,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#F5F5F5',
     paddingVertical: 12,
     paddingHorizontal: 14,
     fontSize: 16,
     borderTopRightRadius: 12,
     borderBottomRightRadius: 12,
+    color: '#333',
   },
   createButton: {
     backgroundColor: '#C73A53',
@@ -233,7 +255,8 @@ const styles = StyleSheet.create<Style>({
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 20,
+    elevation: 2,
   },
   createButtonText: {
     color: '#fff',
@@ -243,12 +266,12 @@ const styles = StyleSheet.create<Style>({
   orText: {
     fontSize: 14,
     color: '#999',
-    marginBottom: 14,
+    marginBottom: 16,
   },
   oauthButton: {
-    backgroundColor: '#E6E6E6',
+    backgroundColor: '#EDEDED',
     width: '100%',
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -261,7 +284,7 @@ const styles = StyleSheet.create<Style>({
   },
   oauthIcon: {
     position: 'absolute',
-    left: 0,
+    left: 16,
     width: 24,
     height: 24,
     resizeMode: 'contain',
@@ -269,12 +292,14 @@ const styles = StyleSheet.create<Style>({
   oauthText: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#333',
   },
   footerText: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 16,
     fontSize: 12,
     color: '#999',
     textAlign: 'center',
+    paddingHorizontal: 20,
   },
-})
+});

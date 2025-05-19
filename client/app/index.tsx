@@ -1,158 +1,139 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native'
-import { router } from 'expo-router'
+  SafeAreaView,
+} from 'react-native';
+import { router } from 'expo-router';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001'
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001';
 
 export default function UserSelectionPage() {
-  const [fetchedValue, setFetchedValue] = useState<string | null>(null)
+  const [fetchedValue, setFetchedValue] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchValue = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/value`)
-        const data = await response.json()
-        setFetchedValue(data.value)
+        const response = await fetch(`${API_URL}/api/value`);
+        const data = await response.json();
+        setFetchedValue(data.value);
       } catch (error) {
-        setFetchedValue("Express Server Status: FAILURE!!")
-        console.error('Error fetching data:', error)
+        setFetchedValue('Server status: Offline');
+        console.error('Error fetching data:', error);
       }
-    }
+    };
 
-    fetchValue()
-  }, [])
+    fetchValue();
+  }, []);
 
   return (
-    <View style={styles.container}>
-      {/* Logo Placeholder */}
+    <SafeAreaView style={styles.container}>
+      {/* Top Section */}
       <View style={styles.topSection}>
         <View style={styles.logoPlaceholder}>
-          <Text style={styles.logoText}>Logo</Text>
+          <Text style={styles.logoText}>SheGo</Text>
         </View>
+        <Text style={styles.heading}>Welcome to SheGo</Text>
+        <Text style={styles.subheading}>Your safe and empowering ride awaits.</Text>
       </View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        <Text style={styles.heading}>Create your account now!</Text>
-
+      {/* Start Button */}
+      <View style={styles.middleSection}>
         <TouchableOpacity
-          style={styles.selectionButton}
+          style={styles.startButton}
           onPress={() => router.push('/register')}
         >
-          <Text style={styles.buttonText}>
-            I&apos;m a <Text style={styles.bold}>Passenger</Text>
-          </Text>
+          <Text style={styles.startText}>Start</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.selectionButton}
-          onPress={() => router.push('./diver-side/driver-registration')}
-        >
-          <Text style={styles.buttonText}>
-            I&apos;m a <Text style={styles.bold}>Driver</Text>
-          </Text>
-        </TouchableOpacity>
-
-        <Text style={styles.linkText}>
-          need an account for both?{' '}
-          <Text style={styles.clickable}>click here</Text>
-        </Text>
-
-        <View style={styles.divider} />
-
-        {/* Display fetched value from backend */}
         {fetchedValue && (
-          <Text style={styles.fetchedText}>{fetchedValue}</Text>
+          <Text style={styles.backendStatus}>{fetchedValue}</Text>
         )}
+      </View>
 
-        <Text style={styles.footer}>
-          Terms & Conditions apply. Lorem ipsum etc etc etc. Copyright Rooslove Ltd.
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          By continuing, you agree to our Terms & Conditions and Privacy Policy.
+          {'\n'}© Rosolve Ltd.
         </Text>
       </View>
-    </View>
-  )
+    </SafeAreaView>
+  );
 }
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
+    justifyContent: 'space-between',
   },
   topSection: {
-    backgroundColor: '#9E2A45',
+    paddingTop: 60,
     alignItems: 'center',
-    paddingTop: 80,
-    paddingBottom: 40,
   },
   logoPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: '#D3D3D3',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20,
   },
   logoText: {
-    fontSize: 12,
-    color: '#555',
-  },
-  content: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 30,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#9E2A45',
   },
   heading: {
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 30,
+    color: '#333',
+    marginBottom: 8,
   },
-  selectionButton: {
-    width: '100%',
-    backgroundColor: '#E6E6E6',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    fontSize: 16,
-    color: '#000',
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
-  linkText: {
-    fontSize: 13,
-    color: '#444',
-    marginTop: 12,
-  },
-  clickable: {
-    textDecorationLine: 'underline',
-    fontWeight: 'bold',
-  },
-  divider: {
-    height: 1,
-    width: '80%',
-    backgroundColor: '#CCC',
-    marginVertical: 20,
-  },
-  fetchedText: {
+  subheading: {
     fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+    paddingHorizontal: 30,
+  },
+  middleSection: {
+    alignItems: 'center',
+  },
+  startButton: {
+    backgroundColor: '#C73A53',
+    paddingVertical: 16,
+    paddingHorizontal: 60,
+    borderRadius: 30,
+    marginBottom: 12,
+  },
+  startText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  backendStatus: {
+    fontSize: 13,
     color: '#9E2A45',
-    marginBottom: 10,
-    fontWeight: 'bold',
+    marginTop: 6,
+    fontWeight: '500',
   },
   footer: {
-    fontSize: 12,
-    color: '#777',
-    textAlign: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    backgroundColor: '#f9f9f9',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
   },
-})
+  footerText: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+});
