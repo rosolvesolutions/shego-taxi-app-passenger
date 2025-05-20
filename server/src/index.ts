@@ -4,6 +4,7 @@ import path from 'path'
 import dotenv from 'dotenv'
 import connectDB from './config/db'
 import passengerRoutes from './routes/passenger'
+import visionRoutes from './routes/visionRoute'
 
 // Load environment variables from .env file
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
@@ -23,6 +24,8 @@ app.get('/api/value', (req, res) => {
 
 // Driver registration routes
 app.use('/api/passenger', passengerRoutes)
+
+app.use('/api/vision', visionRoutes);
 
 app.listen(PORT, () => {
   console.log(`✅ Server running at ${process.env.EXPRESS_SERVER_IP}:${PORT}!`)

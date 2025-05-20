@@ -68,10 +68,7 @@ export default function ProfileNameScreen() {
     }
 
     router.push({
-      pathname: '/profile-verification',
-      params: {
-        userData: JSON.stringify(userData),
-      },
+      pathname: '/index',
     });
   };
 

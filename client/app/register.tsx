@@ -51,7 +51,7 @@ export default function RegisterPage(): JSX.Element {
   const handleCreateAccount = () => {
     if (isPhoneValid(phoneNumber)) {
       router.push({
-        pathname: '/profile-name',
+        pathname: '/VertificationPage',
         params: { phoneNumber },
       });
     } else {
