@@ -15,32 +15,51 @@ import { router } from 'expo-router';
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001';
 
 export default function RideRequestScreen() {
-  const [pickupLocation, setPickupLocation] = useState('');
-  const [destination, setDestination] = useState('');
+  const [pickupAddress, setPickupAddress] = useState('');
+  const [dropoffAddress, setDropoffAddress] = useState('');
 
-  const isFormValid = pickupLocation.trim() !== '' && destination.trim() !== '';
+  const isFormValid = pickupAddress.trim() !== '' && dropoffAddress.trim() !== '';
 
   const handleRequestRide = async () => {
+    // Dummy coordinates — in real app, use Google Maps Geocoding API
+    const dummyPickupCoords = [-0.1257, 51.5085]; // [lng, lat]
+    const dummyDropoffCoords = [-0.1426, 51.5010];
+
     const requestData = {
-      pickupLocation,
-      destination,
+      passengerId: '645f3b1a9f1b2c0012345672', // replace with actual user ID from auth context
+      driverId: null, 
+      pickupLocation: {
+        type: 'Point',
+        coordinates: dummyPickupCoords,
+        address: pickupAddress,
+      },
+      dropoffLocation: {
+        type: 'Point',
+        coordinates: dummyDropoffCoords,
+        address: dropoffAddress,
+      },
+      fare: 25.75, // You can compute this using Distance Matrix API
+      status: 'pending',
+      paymentMethod: 'credit_card',
+      requestedAt: new Date().toISOString(),
+      distanceKm: 4.8,
+      durationMinutes: 25,
     };
 
     try {
-      const response = await fetch(`${API_URL}/api/ride/request`, {
+      const response = await fetch(`${API_URL}/api/booking/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestData),
       });
-
       const result = await response.json();
       console.log('Server response:', result);
 
       if (response.ok && result.message) {
         Alert.alert('Ride Requested ✅', result.message);
-        router.push('/index');
+        router.push('/profile-name');
       } else {
         Alert.alert('Something went wrong', result.error || 'Please try again.');
       }
@@ -66,17 +85,17 @@ export default function RideRequestScreen() {
           <Text style={styles.label}>Pickup Location</Text>
           <TextInput
             style={styles.input}
-            placeholder="e.g., 12 Main Street"
-            value={pickupLocation}
-            onChangeText={setPickupLocation}
+            placeholder="e.g., 10 Downing Street"
+            value={pickupAddress}
+            onChangeText={setPickupAddress}
           />
 
-          <Text style={styles.label}>Destination</Text>
+          <Text style={styles.label}>Dropoff Location</Text>
           <TextInput
             style={styles.input}
-            placeholder="e.g., Airport Terminal 1"
-            value={destination}
-            onChangeText={setDestination}
+            placeholder="e.g., Buckingham Palace"
+            value={dropoffAddress}
+            onChangeText={setDropoffAddress}
           />
 
           <TouchableOpacity
@@ -103,25 +122,25 @@ export default function RideRequestScreen() {
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FCEEF1',
     justifyContent: 'center',
     paddingHorizontal: 24,
     paddingBottom: 40,
   },
   wrapper: {
-    paddingTop: 40,
+    paddingTop: 60,
   },
   heading: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 8,
-    color: '#222',
+    color: '#982F46',
   },
   subheading: {
     fontSize: 14,
     textAlign: 'center',
-    color: '#555',
+    color: '#6D2A39',
     marginBottom: 30,
   },
   label: {
@@ -131,19 +150,22 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   input: {
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     fontSize: 16,
     color: '#000',
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   continueButton: {
     marginTop: 32,
-    backgroundColor: '#C73A53',
+    backgroundColor: '#982F46',
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 30,
     alignItems: 'center',
+    width: '100%',
   },
   disabledButton: {
     backgroundColor: '#ccc',
@@ -155,7 +177,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     fontSize: 12,
-    color: '#888',
+    color: '#777',
     textAlign: 'center',
     marginTop: 40,
     paddingHorizontal: 12,

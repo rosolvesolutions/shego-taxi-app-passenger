@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  TextStyle,
-  ViewStyle,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import * as Google from 'expo-auth-session/providers/google';
@@ -118,145 +119,219 @@ export default function RegisterPage(): JSX.Element {
     }
   }, [fbResponse]);
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.logoPlaceholder}>
-        <Text style={styles.logoText}>SheGo</Text>
+  const ProgressDots = () => (
+    <View style={styles.progressContainer}>
+      <View style={styles.progressGroup}>
+        {[1, 2, 3].map((step) => (
+          <React.Fragment key={step}>
+            <View style={step === 2 ? styles.activeDot : styles.inactiveDot}>
+              <Text style={styles.dotText}>{step}</Text>
+            </View>
+            {step < 3 && <View style={styles.dotLine} />}
+          </React.Fragment>
+        ))}
       </View>
-
-      <Text style={styles.title}>Create your SheGo account</Text>
-
-      <View style={styles.subtitleWrapper}>
-        <Text style={styles.subtitle}>
-          Enter your Irish mobile number or sign in using Google or Facebook to continue.
-        </Text>
-      </View>
-
-      <View style={styles.phoneInputContainer}>
-        <View style={styles.countryCode}>
-          <Text style={styles.countryText}>🇮🇪 +353</Text>
-        </View>
-        <TextInput
-          style={styles.phoneInput}
-          placeholder="858446755"
-          keyboardType="number-pad"
-          value={phoneNumber}
-          onChangeText={handlePhoneInput}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.createButton} onPress={handleCreateAccount}>
-        <Text style={styles.createButtonText}>Create account</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.orText}>OR</Text>
-
-      <TouchableOpacity
-        style={styles.oauthButton}
-        onPress={() => {
-          if (promptGoogle) promptGoogle();
-          else alert('Google login is not ready yet.');
-        }}
-      >
-        <View style={styles.oauthContent}>
-          <Image source={googleIcon} style={styles.oauthIcon} />
-          <Text style={styles.oauthText}>Log in with Google</Text>
-        </View>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.oauthButton} onPress={() => promptFacebook()}>
-        <View style={styles.oauthContent}>
-          <Image source={facebookIcon} style={styles.oauthIcon} />
-          <Text style={styles.oauthText}>Log in with Facebook</Text>
-        </View>
-      </TouchableOpacity>
-
-      <Text style={styles.footerText}>
-        Terms & Conditions apply. By continuing, you agree to our Privacy Policy and User Agreement.
-      </Text>
+      <Text style={styles.stepText}>Step 2 of 3</Text>
     </View>
+  );
+
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={60}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <ProgressDots />
+
+        <View style={styles.logoPlaceholder}>
+          <Text style={styles.logoText}>SheGo</Text>
+        </View>
+
+        <Text style={styles.title}>Create your SheGo account</Text>
+
+        <View style={styles.subtitleWrapper}>
+          <Text style={styles.subtitle}>
+            Enter your Irish mobile number or sign in using Google or Facebook to continue.
+          </Text>
+        </View>
+
+        <View style={styles.phoneInputContainer}>
+          <View style={styles.countryCode}>
+            <Text style={styles.countryText}>🇮🇪 +353</Text>
+          </View>
+          <TextInput
+            style={styles.phoneInput}
+            placeholder="858446755"
+            keyboardType="number-pad"
+            value={phoneNumber}
+            onChangeText={handlePhoneInput}
+          />
+        </View>
+
+        <TouchableOpacity style={styles.createButton} onPress={handleCreateAccount}>
+          <Text style={styles.createButtonText}>Create account</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.orText}>OR</Text>
+
+        <TouchableOpacity
+          style={styles.oauthButton}
+          onPress={() => {
+            if (promptGoogle) promptGoogle();
+            else alert('Google login is not ready yet.');
+          }}
+        >
+          <View style={styles.oauthContent}>
+            <Image source={googleIcon} style={styles.oauthIcon} />
+            <Text style={styles.oauthText}>Log in with Google</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.oauthButton} onPress={() => promptFacebook()}>
+          <View style={styles.oauthContent}>
+            <Image source={facebookIcon} style={styles.oauthIcon} />
+            <Text style={styles.oauthText}>Log in with Facebook</Text>
+          </View>
+        </TouchableOpacity>
+
+        <Text style={styles.footerText}>
+          Terms & Conditions apply. By continuing, you agree to our Privacy Policy and User Agreement.
+        </Text>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
-type Style = {
-  [key: string]: ViewStyle | TextStyle;
-};
-
-const styles = StyleSheet.create<Style>({
+const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     paddingTop: 60,
     paddingHorizontal: 24,
+    backgroundColor: '#FCEEF1',
+    alignItems: 'center',
+    flexGrow: 1,
+    paddingBottom: 100,
+  },
+  progressContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  progressGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  activeDot: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#982F46',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inactiveDot: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#E2E2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dotText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  dotLine: {
+    width: 20,
+    height: 2,
+    backgroundColor: '#ccc',
+    marginHorizontal: 4,
+  },
+  stepText: {
+    fontSize: 13,
+    color: '#982F46',
+    fontWeight: '500',
   },
   logoPlaceholder: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: '#D3D3D3',
+    backgroundColor: '#F7D5DD',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
-    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
   logoText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#9E2A45',
+    color: '#982F46',
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#982F46',
+    marginBottom: 12,
+    textAlign: 'center',
   },
   subtitleWrapper: {
-    marginBottom: 28,
+    marginBottom: 30,
+    paddingHorizontal: 10,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: '#6D2A39',
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
   phoneInputContainer: {
     flexDirection: 'row',
     width: '100%',
     marginBottom: 20,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
   countryCode: {
-    backgroundColor: '#F5F5F5',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderTopLeftRadius: 12,
-    borderBottomLeftRadius: 12,
+    backgroundColor: '#F8E7EA',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     justifyContent: 'center',
     borderRightWidth: 1,
-    borderRightColor: '#ddd',
+    borderRightColor: '#ccc',
   },
   countryText: {
     fontSize: 16,
-    color: '#333',
+    color: '#982F46',
+    fontWeight: '500',
   },
   phoneInput: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    backgroundColor: '#fff',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     fontSize: 16,
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
     color: '#333',
   },
   createButton: {
-    backgroundColor: '#C73A53',
+    backgroundColor: '#982F46',
     width: '100%',
-    paddingVertical: 14,
-    borderRadius: 12,
+    paddingVertical: 16,
+    borderRadius: 30,
     alignItems: 'center',
-    marginBottom: 20,
-    elevation: 2,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 4,
   },
   createButtonText: {
     color: '#fff',
@@ -265,16 +340,19 @@ const styles = StyleSheet.create<Style>({
   },
   orText: {
     fontSize: 14,
-    color: '#999',
+    color: '#666',
     marginBottom: 16,
   },
   oauthButton: {
-    backgroundColor: '#EDEDED',
+    backgroundColor: '#fff',
     width: '100%',
     paddingVertical: 14,
     paddingHorizontal: 16,
-    borderRadius: 12,
-    marginBottom: 12,
+    borderRadius: 30,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    elevation: 2,
   },
   oauthContent: {
     flexDirection: 'row',
@@ -295,11 +373,10 @@ const styles = StyleSheet.create<Style>({
     color: '#333',
   },
   footerText: {
-    position: 'absolute',
-    bottom: 16,
     fontSize: 12,
-    color: '#999',
+    color: '#888',
     textAlign: 'center',
+    marginTop: 40,
     paddingHorizontal: 20,
   },
 });
