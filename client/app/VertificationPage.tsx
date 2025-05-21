@@ -47,7 +47,6 @@ export default function VerificationPage(): JSX.Element {
     setImageUri(null)
   }
 
-  // 更智能的性别提取函数（容错、结构匹配）
   const extractGenderFromMRZ = (mrzLine: string): string | null => {
     if (!mrzLine) return null
 
