@@ -93,7 +93,7 @@ export default function RideRequestScreen() {
 
         <Text style={styles.footer}>
           Our drivers are all background-checked and trained to ensure your safety.
-          By requesting a ride, you agree to SheGo's Terms and Conditions.
+          By requesting a ride, you agree to SheGo&apos;s Terms and Conditions.
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>
