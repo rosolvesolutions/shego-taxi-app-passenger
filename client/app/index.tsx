@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native'
-import { router } from 'expo-router'
+import { router, Link } from 'expo-router'
 
 export default function UserSelectionPage() {
   const [fetchedValue, setFetchedValue] = useState<string | null>(null)
@@ -56,6 +56,14 @@ export default function UserSelectionPage() {
           </Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.selectionButton}
+          onPress={() => router.push('/homepage')}
+        >
+          <Text style={styles.buttonText}>
+            Go to <Text style={styles.bold}>Map</Text>
+          </Text>
+        </TouchableOpacity>
 
         <Text style={styles.linkText}>
           need an account for both?{' '}

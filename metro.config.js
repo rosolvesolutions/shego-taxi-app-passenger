@@ -1,7 +1,9 @@
-const { getDefaultConfig } = require('metro-config');
+// metro.config.js
+const { getDefaultConfig } = require('@expo/metro-config');
 
-module.exports = (async () => {
-  const config = await getDefaultConfig();
-  config.resolver.sourceExts.push('cjs', 'jsx');
-  return config;
-})();
+const config = getDefaultConfig(__dirname);
+
+// Add this to ensure proper resolution of Expo Router
+config.resolver.sourceExts = [...config.resolver.sourceExts, 'mjs'];
+
+module.exports = config;

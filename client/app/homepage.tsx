@@ -1,31 +1,28 @@
 import React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { router } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, /*Image*/ SafeAreaView, TextInput} from 'react-native'; // commented Image out to pass the check
+import { View, Text, StyleSheet, TouchableOpacity, Platform, SafeAreaView, TextInput, Dimensions, Alert } from 'react-native'; 
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Animated, Pressable } from 'react-native';
-import { useEffect } from 'react';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-
-
 
 // Home page screen component
 export default function HomePage() {
+  // Map and location state
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isTracking, setIsTracking] = useState(false);
+  const mapRef = useRef<MapView | null>(null);
 
   // Where to button
   const [searchActive, setSearchActive] = useState(false);
   const [searchText, setSearchText] = useState('');
 
-
   //Toggle Menu 
   const [menuVisible, setMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-250)).current; // start off-screen
   
-  // commented out to pass the workflow action
-  /*const toggleMenu = () => {
-      setMenuVisible(!menuVisible);
-  };*/
   const openMenu = () => {
     console.log('Opening menu....')
     setMenuVisible(true);
@@ -46,7 +43,6 @@ export default function HomePage() {
     });
   };
   
-
   // Searchbar
   const handleSearch = (query: string) => {
     console.log('User searched:', query);
@@ -58,11 +54,7 @@ export default function HomePage() {
   const [greeting, setGreeting] = useState('');
   const userName = 'Midas'; // Replace with dynamic value later
 
-  // State for tracking user's current location
-  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
-  const [/*errorMsg*/, setErrorMsg] = useState<string | null>(null);
-
-
+  // Set greeting based on time of day
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good morning');
@@ -70,35 +62,103 @@ export default function HomePage() {
     else setGreeting('Good evening');
   }, []);
 
+  // Setup location tracking with improved implementation from App.js
   useEffect(() => {
-    let subscriber: Location.LocationSubscription | undefined;
-  
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
+    let locationSubscription: Location.LocationSubscription | null = null;
+
+    const getLocationPermission = async () => {
+      console.log("Requesting location permissions...");
+      try {
+        // Request foreground permission
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          Alert.alert(
+            "Location Permission Required",
+            "Please enable location permissions to see your current location on the map.",
+            [{ text: "OK" }]
+          );
+          return;
+        }
+        
+        console.log("Foreground permission granted, getting current position...");
+        
+        // Get initial location with high accuracy
+        const currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Highest
+        });
+        
+        console.log("Current location:", JSON.stringify(currentLocation.coords));
+        setLocation(currentLocation.coords);
+        
+        // Center the map on the user's location
+        if (mapRef.current && currentLocation) {
+          mapRef.current.animateToRegion({
+            latitude: currentLocation.coords.latitude,
+            longitude: currentLocation.coords.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          }, 1000);
+        }
+
+        // Set up location tracking
+        setIsTracking(true);
+        locationSubscription = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.Highest,
+            distanceInterval: 10, // Update if user moves by 10 meters
+            timeInterval: 5000   // Or every 5 seconds
+          },
+          (newLocation) => {
+            console.log("Location updated:", JSON.stringify(newLocation.coords));
+            setLocation(newLocation.coords);
+            
+            // Keep the map centered on the user as they move
+            if (mapRef.current) {
+              mapRef.current.animateToRegion({
+                latitude: newLocation.coords.latitude,
+                longitude: newLocation.coords.longitude,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+              }, 1000);
+            }
+          }
+        );
+
+      } catch (error) {
+        console.error("Error getting location:", error);
+        setErrorMsg(`Error getting location: ${error}`);
+        Alert.alert("Location Error", error.message);
       }
-  
-      const loc = await Location.getCurrentPositionAsync({});
-      console.log("📍 Current location:", loc.coords);
-      setLocation(loc.coords);
-    })();
-  
+    };
+
+    getLocationPermission();
+
+    // Cleanup function
     return () => {
-      subscriber?.remove();
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
     };
   }, []);
   
+  // Function to recenter map on user's location
+  const recenterMap = () => {
+    if (mapRef.current && location) {
+      mapRef.current.animateToRegion({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }, 1000);
+    }
+  };
   
-  
-  // Location options
+  // Location options for search
   const recentPlaces = ['📍 123 Oxford Street', '📍 Home', '📍 Starbucks - Camden'];
   const smartSuggestions = ['🏢 Work', '🏋️ Gym', '🛒 Grocery Store'];
 
-  
-
-  
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1, position: 'relative' }}>
@@ -107,13 +167,15 @@ export default function HomePage() {
       <View style={{ flex: 1, minHeight: 300 }}>
         {location ? (
           <MapView
-            style={{ flex:1 }}
-            region={{
+            ref={mapRef}
+            style={{ flex: 1 }}
+            provider={PROVIDER_GOOGLE}
+            initialRegion={{
               latitude: location.latitude,
               longitude: location.longitude,
               latitudeDelta: 0.005,
               longitudeDelta: 0.005,
-              }}
+            }}
             showsUserLocation={true}
             followsUserLocation={true}
           >
@@ -133,155 +195,152 @@ export default function HomePage() {
         )}
       </View>
 
+      {/* Recenter Button */}
+      <TouchableOpacity 
+        style={styles.recenterButton} 
+        onPress={recenterMap}
+      >
+        <Ionicons name="locate" size={24} color="#fff" />
+      </TouchableOpacity>
 
       {/* Greeting */}
-    <View style={styles.greetingContainer}>
-      <Text style={styles.greetingText}>
-        {greeting}, {userName} <Text style={{ fontSize: 20 }}>👋</Text>
-      </Text>
-      <Text style={styles.greetingSub}>“Character is power.”🎖️</Text>
-    </View>
-
+      <View style={styles.greetingContainer}>
+        <Text style={styles.greetingText}>
+          {greeting}, {userName} <Text style={{ fontSize: 20 }}>👋</Text>
+        </Text>
+        <Text style={styles.greetingSub}>"Character is power."🎖️</Text>
+      </View>
 
       {/* Top-left hamburger menu icon */}
       <TouchableOpacity style={styles.menuButton} onPress={openMenu}>
         <FontAwesome5 name="bars" size={20} color="#fff" />
       </TouchableOpacity>
 
-
       {/* Blurred overlay for enhanced contrast */}
       <View style={styles.overlay} />
 
       {/* Centered "Where to?" button */}
       {!searchActive ? (
-      <TouchableOpacity style={styles.whereToButton} onPress={() => setSearchActive(true)}>
-        <Text style={styles.whereToText}>Where to?</Text>
-      </TouchableOpacity>
-        ) : (
-      <View style={styles.searchBarContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search destination..."
-          placeholderTextColor="#ccc"
-          value={searchText}
-          onChangeText={setSearchText}
-          onSubmitEditing={() => handleSearch(searchText)}
-          autoFocus
-        />
-        <TouchableOpacity onPress={() => {
-          setSearchText('');
-          setSearchActive(false);
-        }}>
-          <Ionicons name="close-circle" size={22} color="#fff" style={styles.clearIcon} />
+        <TouchableOpacity style={styles.whereToButton} onPress={() => setSearchActive(true)}>
+          <Text style={styles.whereToText}>Where to?</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.searchBarContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search destination..."
+            placeholderTextColor="#ccc"
+            value={searchText}
+            onChangeText={setSearchText}
+            onSubmitEditing={() => handleSearch(searchText)}
+            autoFocus
+          />
+          <TouchableOpacity onPress={() => {
+            setSearchText('');
+            setSearchActive(false);
+          }}>
+            <Ionicons name="close-circle" size={22} color="#fff" style={styles.clearIcon} />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Suggestions List */}
+      {searchActive && (
+        <View style={styles.suggestionsContainer}>
+          {searchText === '' && (
+            <>
+              <Text style={styles.suggestionHeading}>Recent</Text>
+              {recentPlaces.map((place, index) => (
+                <TouchableOpacity key={index} style={styles.suggestionItem}>
+                  <Text style={styles.suggestionText}>{place}</Text>
+                </TouchableOpacity>
+              ))}
+              <Text style={styles.suggestionHeading}>Suggestions</Text>
+              {smartSuggestions.map((place, index) => (
+                <TouchableOpacity key={index} style={styles.suggestionItem}>
+                  <Text style={styles.suggestionText}>{place}</Text>
+                </TouchableOpacity>
+              ))}
+            </>
+          )}
+        </View>
+      )}
+        
+      {/* Quick Actions */}
+      <View style={styles.quickActionsContainer}>
+        <TouchableOpacity
+          style={styles.quickCard}
+          onPress={() => handleSearch('Home')}>
+          <Text style={styles.quickEmoji}>🏠</Text>
+          <Text style={styles.quickLabel}>Go Home</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.quickCard}
+          onPress={() => handleSearch('Work')}>
+          <Text style={styles.quickEmoji}>🏢</Text>
+          <Text style={styles.quickLabel}>Go to Work</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.quickCard}
+          onPress={() => handleSearch('Schedule')}>
+          <Text style={styles.quickEmoji}>📅</Text>
+          <Text style={styles.quickLabel}>Schedule</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.quickCard}
+          onPress={() => handleSearch('Groceries')}>
+          <Text style={styles.quickEmoji}>🛒</Text>
+          <Text style={styles.quickLabel}>Groceries</Text>
         </TouchableOpacity>
       </View>
-    )}
-
-    {/* Suggestions List */}
-    {searchActive && (
-      <View style={styles.suggestionsContainer}>
-        {searchText === '' && (
-          <>
-            <Text style={styles.suggestionHeading}>Recent</Text>
-            {recentPlaces.map((place, index) => (
-              <TouchableOpacity key={index} style={styles.suggestionItem}>
-                <Text style={styles.suggestionText}>{place}</Text>
-              </TouchableOpacity>
-            ))}
-            <Text style={styles.suggestionHeading}>Suggestions</Text>
-            {smartSuggestions.map((place, index) => (
-              <TouchableOpacity key={index} style={styles.suggestionItem}>
-                <Text style={styles.suggestionText}>{place}</Text>
-              </TouchableOpacity>
-            ))}
-          </>
-        )}
-      </View>
-    )}
-      
-
-    {/* Quick Actions */}
-    <View style={styles.quickActionsContainer}>
-    <TouchableOpacity
-      style={styles.quickCard}
-        onPress={() => handleSearch('Home')}>
-        <Text style={styles.quickEmoji}>🏠</Text>
-        <Text style={styles.quickLabel}>Go Home</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.quickCard}
-        onPress={() => handleSearch('Work')}>
-        <Text style={styles.quickEmoji}>🏢</Text>
-        <Text style={styles.quickLabel}>Go to Work</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.quickCard}
-        onPress={() => handleSearch('Schedule')}>
-        <Text style={styles.quickEmoji}>📅</Text>
-        <Text style={styles.quickLabel}>Schedule</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.quickCard}
-        onPress={() => handleSearch('Groceries')}>
-        <Text style={styles.quickEmoji}>🛒</Text>
-        <Text style={styles.quickLabel}>Groceries</Text>
-      </TouchableOpacity>
-
-    </View>
-
-
 
       {/* Bottom navigation bar with icons */}
       <View style={styles.bottomNav}>
-      <TouchableOpacity style={styles.navItem} onPress={() => router.push('/homepage')}>
-        <Ionicons name="home-outline" size={22} color="white" />
-        <Text style={styles.navText}>Home</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/homepage')}>
+          <Ionicons name="home-outline" size={22} color="white" />
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.navItem} onPress={() => router.push('/settings')}>
-        <Ionicons name="settings-outline" size={22} color="white" />
-        <Text style={styles.navText}>Settings</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/settings')}>
+          <Ionicons name="settings-outline" size={22} color="white" />
+          <Text style={styles.navText}>Settings</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.navItem} onPress={() => router.push('/profile')}>
-        <Ionicons name="person-outline" size={22} color="white" />
-        <Text style={styles.navText}>Profile</Text>
-      </TouchableOpacity>
-
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/profile')}>
+          <Ionicons name="person-outline" size={22} color="white" />
+          <Text style={styles.navText}>Profile</Text>
+        </TouchableOpacity>
       </View>
       
-      <>
-  {/* Menu Backdrop - only visible when menu is open */}
-  {menuVisible && <Pressable style={styles.menuBackdrop} onPress={closeMenu} />}
+      {/* Menu Backdrop - only visible when menu is open */}
+      {menuVisible && <Pressable style={styles.menuBackdrop} onPress={closeMenu} />}
 
-  {/* Always render the menu, slide it in/out */}
-  <Animated.View style={[styles.sideMenu, { left: slideAnim }]}>
-    <Text style={styles.menuTitle}>Menu</Text>
+      {/* Always render the menu, slide it in/out */}
+      <Animated.View style={[styles.sideMenu, { left: slideAnim }]}>
+        <Text style={styles.menuTitle}>Menu</Text>
 
-    <TouchableOpacity onPress={() => {
-      closeMenu();
-      router.push('../profile');
-    }}>
-      <Text style={styles.menuItem}>Profile</Text>
-    </TouchableOpacity>
+        <TouchableOpacity onPress={() => {
+          closeMenu();
+          router.push('../profile');
+        }}>
+          <Text style={styles.menuItem}>Profile</Text>
+        </TouchableOpacity>
 
-    <TouchableOpacity onPress={() => {
-      closeMenu();
-      router.push('../settings');
-    }}>
-      <Text style={styles.menuItem}>Settings</Text>
-    </TouchableOpacity>
+        <TouchableOpacity onPress={() => {
+          closeMenu();
+          router.push('../settings');
+        }}>
+          <Text style={styles.menuItem}>Settings</Text>
+        </TouchableOpacity>
 
-    <TouchableOpacity onPress={closeMenu}>
-      <Text style={[styles.menuItem, { color: '#ccc' }]}>Close</Text>
-    </TouchableOpacity>
-  </Animated.View>
-</>
-
-    </View>
+        <TouchableOpacity onPress={closeMenu}>
+          <Text style={[styles.menuItem, { color: '#ccc' }]}>Close</Text>
+        </TouchableOpacity>
+      </Animated.View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -311,17 +370,30 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(92,26,39,0.85)',
     padding: 14,
     borderRadius: 18,
-    zIndex: 99, // ⬅️ Make sure this is above background and overlay
+    zIndex: 99,
     elevation: 8,
   },
-  
-
+  recenterButton: {
+    position: 'absolute',
+    bottom: 150,
+    right: 20,
+    backgroundColor: 'rgba(92,26,39,0.85)',
+    padding: 14,
+    borderRadius: 30,
+    zIndex: 90,
+    elevation: 8,
+  },
+  placeholder: {
+    flex: 1,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   menuBackdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     zIndex: 999, // less than sideMenu
   },
-  
   sideMenu: {
     position: 'absolute',
     top: 0,
@@ -330,28 +402,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#5C1A27',
     paddingTop: 80,
     paddingHorizontal: 20,
-    zIndex: 1000, // ⬅️ forces it above the backdrop
+    zIndex: 1000, // forces it above the backdrop
     elevation: 100,
     shadowColor: '#000',
     shadowOffset: { width: 4, height: 0 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
   },
-  
-  
   menuTitle: {
     color: '#fff',
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 20,
   },
-  
   menuItem: {
     fontSize: 16,
     color: '#fff',
     paddingVertical: 10,
   },
-  
   greetingContainer: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 20 : 10,
@@ -372,8 +440,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontStyle: 'italic',
   },
-  
-
   whereToButton: {
     position: 'absolute',
     top: '42%',
@@ -417,7 +483,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     paddingVertical: 2,
   },
-
   suggestionsContainer: {
     position: 'absolute',
     top: '52%',
@@ -465,7 +530,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 14,
   },
-  
   suggestionHeading: {
     fontSize: 14,
     fontWeight: '600',
@@ -481,11 +545,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#444',
   },
-  
   clearIcon: {
     marginLeft: 10,
   },
-  
   bottomNav: {
     position: 'absolute',
     bottom: 0,
@@ -516,4 +578,3 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 });
-
