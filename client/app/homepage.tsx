@@ -11,7 +11,8 @@ import * as Location from 'expo-location';
 export default function HomePage() {
   // Map and location state
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  // errorMsg variable was deleted to pass lint error
+  const [, setErrorMsg] = useState<string | null>(null);
   const mapRef = useRef<MapView | null>(null);
 
   // Where to button
@@ -124,7 +125,7 @@ export default function HomePage() {
           }
         );
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error getting location:", error);
         setErrorMsg(`Error getting location: ${error}`);
         Alert.alert("Location Error", error.message);
