@@ -10,66 +10,44 @@ import {
   ScrollView,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001';
 
-export default function ProfileNameScreen() {
-  const {
-    firstName: paramFirstName = '',
-    lastName: paramLastName = '',
-    phoneNumber: paramPhoneNumber = '',
-  } = useLocalSearchParams();
+export default function RideRequestScreen() {
+  const [pickupLocation, setPickupLocation] = useState('');
+  const [destination, setDestination] = useState('');
 
-  const [firstName, setFirstName] = useState(paramFirstName);
-  const [lastName, setLastName] = useState(paramLastName);
-  const [email, setEmail] = useState('');
-  const phoneNumber = paramPhoneNumber;
+  const isFormValid = pickupLocation.trim() !== '' && destination.trim() !== '';
 
-  const isValidEmail = (email: string) =>
-    /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
-
-  const isFormValid =
-    firstName.trim() !== '' &&
-    lastName.trim() !== '' &&
-    isValidEmail(email);
-
-  const handleContinue = async () => {
-    const userData = {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
+  const handleRequestRide = async () => {
+    const requestData = {
+      pickupLocation,
+      destination,
     };
 
     try {
-      const response = await fetch(`${API_URL}/api/passenger/register`, {
+      const response = await fetch(`${API_URL}/api/ride/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(requestData),
       });
 
       const result = await response.json();
       console.log('Server response:', result);
 
-      if (response.ok && result.message?.toLowerCase().includes('success')) {
-        Alert.alert('Signup successful!', result.message);
+      if (response.ok && result.message) {
+        Alert.alert('Ride Requested ✅', result.message);
+        router.push('/index');
       } else {
-        Alert.alert(
-          'Signup warning',
-          result.message || 'Could not verify success, proceeding anyway.'
-        );
+        Alert.alert('Something went wrong', result.error || 'Please try again.');
       }
     } catch (error) {
-      console.error(error);
-      console.warn('⚠️ Failed to send to backend. Proceeding anyway.');
+      console.error('Error requesting ride:', error);
+      Alert.alert('Network Error', 'Failed to contact server.');
     }
-
-    router.push({
-      pathname: '/request-ride',
-    });
   };
 
   return (
@@ -80,35 +58,25 @@ export default function ProfileNameScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.wrapper}>
-          <Text style={styles.heading}>Welcome to SheGo 🎉</Text>
+          <Text style={styles.heading}>Request a Ride 🛺</Text>
           <Text style={styles.subheading}>
-            Please enter your details to complete your profile.
+            Enter your pickup and destination below.
           </Text>
 
-          <Text style={styles.label}>First name</Text>
+          <Text style={styles.label}>Pickup Location</Text>
           <TextInput
             style={styles.input}
-            placeholder="Jane"
-            value={firstName}
-            onChangeText={setFirstName}
+            placeholder="e.g., 12 Main Street"
+            value={pickupLocation}
+            onChangeText={setPickupLocation}
           />
 
-          <Text style={styles.label}>Last name</Text>
+          <Text style={styles.label}>Destination</Text>
           <TextInput
             style={styles.input}
-            placeholder="Doe"
-            value={lastName}
-            onChangeText={setLastName}
-          />
-
-          <Text style={styles.label}>Email (Gmail only)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="example@gmail.com"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
+            placeholder="e.g., Airport Terminal 1"
+            value={destination}
+            onChangeText={setDestination}
           />
 
           <TouchableOpacity
@@ -116,16 +84,16 @@ export default function ProfileNameScreen() {
               styles.continueButton,
               !isFormValid && styles.disabledButton,
             ]}
-            onPress={handleContinue}
+            onPress={handleRequestRide}
             disabled={!isFormValid}
           >
-            <Text style={styles.continueText}>Continue</Text>
+            <Text style={styles.continueText}>Request Ride</Text>
           </TouchableOpacity>
         </View>
 
         <Text style={styles.footer}>
-          All personal data is processed in line with GDPR and privacy best
-          practices. By continuing, you agree to our Terms and Privacy Policy.
+          Our drivers are all background-checked and trained to ensure your safety.
+          By requesting a ride, you agree to SheGo's Terms and Conditions.
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>

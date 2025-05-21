@@ -43,7 +43,7 @@ export default function UserSelectionPage() {
       <View style={styles.middleSection}>
         <TouchableOpacity
           style={styles.startButton}
-          onPress={() => router.push('/register')}
+          onPress={() => router.push('/request-ride')}
         >
           <Text style={styles.startText}>Start</Text>
         </TouchableOpacity>
