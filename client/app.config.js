@@ -1,4 +1,7 @@
-{
+// client/app.config.js
+import 'dotenv/config';
+
+export default {
   "expo": {
     "name": "temp-project",
     "slug": "temp-project",
@@ -30,7 +33,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.yourcompany.tempproject",
       "config": {
-        "googleMapsApiKey": "AIzaSyDD_gfF8LmaK-Z4pbdy2bd8TGgkcat1-qo"
+        "googleMapsApiKey": process.env.GOOGLE_MAPS_API_KEY
       },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show it on the map.",
@@ -49,7 +52,7 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyDD_gfF8LmaK-Z4pbdy2bd8TGgkcat1-qo"
+          "apiKey": process.env.GOOGLE_MAPS_API_KEY
         }
       },
       "edgeToEdgeEnabled": true
@@ -63,4 +66,4 @@
       "typedRoutes": true
     }
   }
-}
+};

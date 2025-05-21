@@ -1,3 +1,4 @@
+// client/app/map-test.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, Dimensions, Alert, Button, SafeAreaView } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -7,7 +8,6 @@ import { Stack } from 'expo-router';
 export default function MapTest() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [isTracking, setIsTracking] = useState(false);
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -50,7 +50,6 @@ export default function MapTest() {
         }
 
         // Set up location tracking
-        setIsTracking(true);
         locationSubscription = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.Highest,

@@ -1,29 +1,30 @@
-import React, { useEffect, useState } from 'react'
+// client/app/index.tsx
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native'
-import { router, Link } from 'expo-router'
+} from 'react-native';
+import { router } from 'expo-router';
 
 export default function UserSelectionPage() {
-  const [fetchedValue, setFetchedValue] = useState<string | null>(null)
+  const [fetchedValue, setFetchedValue] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchValue = async () => {
       try {
-        const response = await fetch('http://172.20.10.2:5001/api/value')
-        const data = await response.json()
-        setFetchedValue(data.value)
+        const response = await fetch('http://172.20.10.2:5001/api/value');
+        const data = await response.json();
+        setFetchedValue(data.value);
       } catch (error) {
-        setFetchedValue("Express Server Status: FAILURE!!")
-        console.error('Error fetching data:', error)
+        setFetchedValue("Express Server Status: FAILURE!!");
+        console.error('Error fetching data:', error);
       }
-    }
+    };
 
-    fetchValue()
-  }, [])
+    fetchValue();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -78,11 +79,11 @@ export default function UserSelectionPage() {
         )}
 
         <Text style={styles.footer}>
-          Terms & Conditions apply. Lorem ipsum etc etc etc. Copyright Rooslove Ltd.
+          Terms &amp; Conditions apply. Lorem ipsum etc etc etc. Copyright Rooslove Ltd.
         </Text>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -161,4 +162,4 @@ const styles = StyleSheet.create({
     color: '#777',
     textAlign: 'center',
   },
-})
+});

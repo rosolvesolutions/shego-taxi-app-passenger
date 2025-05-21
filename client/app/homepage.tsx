@@ -1,7 +1,7 @@
-import React from 'react';
-import { useState, useRef, useEffect } from 'react';
+// client/app/homepage.tsx
+import React, { useState, useRef, useEffect } from 'react';
 import { router } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, SafeAreaView, TextInput, Dimensions, Alert } from 'react-native'; 
+import { View, Text, StyleSheet, TouchableOpacity, Platform, SafeAreaView, TextInput, Alert } from 'react-native'; 
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Animated, Pressable } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -12,7 +12,6 @@ export default function HomePage() {
   // Map and location state
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isTracking, setIsTracking] = useState(false);
   const mapRef = useRef<MapView | null>(null);
 
   // Where to button
@@ -103,7 +102,6 @@ export default function HomePage() {
         }
 
         // Set up location tracking
-        setIsTracking(true);
         locationSubscription = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.Highest,
@@ -126,7 +124,7 @@ export default function HomePage() {
           }
         );
 
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error getting location:", error);
         setErrorMsg(`Error getting location: ${error}`);
         Alert.alert("Location Error", error.message);
@@ -208,7 +206,7 @@ export default function HomePage() {
         <Text style={styles.greetingText}>
           {greeting}, {userName} <Text style={{ fontSize: 20 }}>👋</Text>
         </Text>
-        <Text style={styles.greetingSub}>"Character is power."🎖️</Text>
+        <Text style={styles.greetingSub}>&quot;Character is power.&quot;🎖️</Text>
       </View>
 
       {/* Top-left hamburger menu icon */}
