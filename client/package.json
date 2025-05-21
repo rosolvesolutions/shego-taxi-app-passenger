@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build": "npx expo export:web" 
+    "build": "npx expo export" 
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
