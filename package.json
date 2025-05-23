@@ -26,5 +26,12 @@
     "bugs": {
         "url": "https://github.com/rosolvesolutions/shego-taxi-app-driver/issues"
     },
+<<<<<<< HEAD
     "homepage": "https://github.com/rosolvesolutions/shego-taxi-app-driver#readme"
+=======
+    "homepage": "https://github.com/rosolvesolutions/shego-taxi-app-driver#readme",
+    "dependencies": {
+        "expo": "^53.0.8"
+    }
+>>>>>>> e5860c7 (Add all project files - needs restructuring)
 }
