@@ -1,0 +1,19 @@
+{
+  "name": "shego-taxi-app-passenger",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for Shego Taxi App",
+  "scripts": {
+    "lint": "echo 'No lint configured yet'",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "client": "cd client && npm start",
+    "server": "cd server && npm start"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ]
+}
