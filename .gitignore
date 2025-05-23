@@ -4,9 +4,14 @@ client/node_modules/
 server/node_modules/
 client/.env
 server/.env
+*/node_modules/
 
 # Logs
 *.log
+
+# Temporary files
+tmp/
+temp/
 
 # OS-specific junk
 .DS_Store
@@ -16,3 +21,32 @@ Thumbs.db
 .env
 .env.local
 docker-compose.yml
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Expo
+.expo/
+*/.expo/
+dist/
+*/dist/
+
+# React Native
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# Debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
