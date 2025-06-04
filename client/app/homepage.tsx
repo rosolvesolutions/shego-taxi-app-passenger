@@ -6,6 +6,7 @@ import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Animated, Pressable } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { GOOGLE_MAPS_API_KEY } from '@env';
 
 // Home page screen
 export default function HomePage() {
@@ -22,7 +23,19 @@ export default function HomePage() {
   //Toggle Menu 
   const [menuVisible, setMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-250)).current; // start off-screen
-  
+
+  // Add this in your component (remove after testing)
+  useEffect(() => {
+    console.log('API Key loaded:', GOOGLE_MAPS_API_KEY ? 'Yes' : 'No');
+    console.log('API Key first 10 chars:', GOOGLE_MAPS_API_KEY?.substring(0, 10));
+    console.log('API Key length:', GOOGLE_MAPS_API_KEY?.length);
+  }, []);
+
+  useEffect(() => {
+    console.log('Current API Key:', GOOGLE_MAPS_API_KEY);
+    console.log('Is it fake?', GOOGLE_MAPS_API_KEY === 'fake_key_test');
+  }, []);
+
   const openMenu = () => {
     console.log('Opening menu....')
     setMenuVisible(true);
@@ -105,7 +118,7 @@ export default function HomePage() {
         // Set up location tracking
         locationSubscription = await Location.watchPositionAsync(
           {
-            accuracy: Location.Accuracy.Highest,
+            accuracy: Location.Accuracy.High,
             distanceInterval: 10, // Update if user moves by 10 meters
             timeInterval: 5000   // Or every 5 seconds
           },
@@ -176,7 +189,17 @@ export default function HomePage() {
               longitudeDelta: 0.005,
             }}
             showsUserLocation={true}
-            followsUserLocation={true}
+            followsUserLocation={false}  // Changed to false to allow manual interaction
+            // Add these interaction props:
+            scrollEnabled={true}         // Enables panning/scrolling
+            zoomEnabled={true}           // Enables pinch to zoom
+            pitchEnabled={true}          // Enables tilting the map
+            rotateEnabled={true}         // Enables rotation
+            zoomTapEnabled={true}        // Enables double-tap to zoom
+            zoomControlEnabled={false}   // Disable zoom controls (optional)
+            showsCompass={true}          // Shows compass control
+            showsMyLocationButton={false} // We have our own recenter button
+            mapType='standard'
           >
             <Marker
               coordinate={{
@@ -215,7 +238,7 @@ export default function HomePage() {
       </TouchableOpacity>
 
       {/* Blurred overlay for enhanced contrast */}
-      <View style={styles.overlay} />
+      <View style={styles.overlay} pointerEvents='none' />
 
       {/* Centered "Where to?" button */}
       {!searchActive ? (
@@ -329,6 +352,7 @@ const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.25)',
+    pointerEvents: 'none',
   },
   menuButton: {
     position: 'absolute',

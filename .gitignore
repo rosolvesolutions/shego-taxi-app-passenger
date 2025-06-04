@@ -50,3 +50,10 @@ yarn-error.*
 .vscode/
 *.swp
 *.swo
+
+# Temporary files
+*.log
+tmp/
+temp/
+
+expo-env.d.ts
