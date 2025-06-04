@@ -37,7 +37,8 @@ export default {
       },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show it on the map.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to your location to show it on the map."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to your location to show it on the map.",
+        "GMSApiKey": process.env.GOOGLE_MAPS_API_KEY
       }
     },
     "android": {
