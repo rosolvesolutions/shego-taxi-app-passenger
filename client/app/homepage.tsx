@@ -7,7 +7,6 @@ import { Animated, Pressable } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { GOOGLE_MAPS_API_KEY } from '@env';
-import { Platform } from 'react-native';
 
 // Home page screen
 export default function HomePage() {
