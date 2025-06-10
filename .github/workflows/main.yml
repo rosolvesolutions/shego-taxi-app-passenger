@@ -52,7 +52,11 @@ jobs:
       # 8. Build client
       - name: Build Client
         working-directory: client
-        run: npm run build
+        run: |
+          if [ "$CI_PLATFORM" != "web" ]; then
+            echo "Running native-only build"
+            npm run build:native
+          fi
 
       # 9. Build server
       - name: Build Server
