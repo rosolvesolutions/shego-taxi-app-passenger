@@ -20,7 +20,6 @@ export default function VerificationPage(): JSX.Element {
   const { phoneNumber, email, city } = useLocalSearchParams();
   const router = useRouter();
 
-  const userInfo = phoneNumber || email || 'User';
   const [imageUri, setImageUri] = useState<string | null>(null);
 
   const launchCamera = async () => {

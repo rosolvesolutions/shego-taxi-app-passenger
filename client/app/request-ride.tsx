@@ -10,7 +10,6 @@ import {
   ScrollView,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.4:8080';
 
@@ -18,7 +17,13 @@ export default function RideRequestScreen() {
   const [pickupAddress, setPickupAddress] = useState('');
   const [dropoffAddress, setDropoffAddress] = useState('');
   const [rideStatus, setRideStatus] = useState('');
-  const [driverInfo, setDriverInfo] = useState<any>(null);
+  type DriverInfo = {
+    name: string;
+    vehicle: string;
+    plate: string;
+    phone: string;
+  };
+  const [driverInfo, setDriverInfo] = useState<DriverInfo | null>(null);
 
   const isFormValid = pickupAddress.trim() !== '' && dropoffAddress.trim() !== '';
 
@@ -92,7 +97,7 @@ const pollBookingStatus = () => {
         Alert.alert('Driver Accepted ✅', 'Your driver is on the way!');
       }
     } catch (err) {
-      console.warn('Polling failed, retrying...');
+      console.warn('Polling failed, retrying...' + err);
       // don't stop polling — just continue
     }
   }, 2000); // poll every 2 seconds
