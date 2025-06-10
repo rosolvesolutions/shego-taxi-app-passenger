@@ -7,6 +7,7 @@ import { Animated, Pressable } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { GOOGLE_MAPS_API_KEY } from '@env';
+import { Platform } from 'react-native';
 
 // Home page screen
 export default function HomePage() {
@@ -177,7 +178,7 @@ export default function HomePage() {
 
       {/* Live location-tracking map using Expo Location and react-native-maps */}
       <View style={{ flex: 1, minHeight: 300 }}>
-        {location ? (
+        {Platform.OS !== 'web' ? (
           <MapView
             ref={mapRef}
             style={{ flex: 1 }}
@@ -190,7 +191,7 @@ export default function HomePage() {
             }}
             showsUserLocation={true}
             followsUserLocation={false}  // Changed to false to allow manual interaction
-            // Add these interaction props:
+            // Interaction props:
             scrollEnabled={true}         // Enables panning/scrolling
             zoomEnabled={true}           // Enables pinch to zoom
             pitchEnabled={true}          // Enables tilting the map
