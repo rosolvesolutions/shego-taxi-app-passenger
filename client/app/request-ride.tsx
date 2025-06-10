@@ -12,22 +12,23 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.4:8080';
 
 export default function RideRequestScreen() {
   const [pickupAddress, setPickupAddress] = useState('');
   const [dropoffAddress, setDropoffAddress] = useState('');
+  const [rideStatus, setRideStatus] = useState('');
+  const [driverInfo, setDriverInfo] = useState<any>(null);
 
   const isFormValid = pickupAddress.trim() !== '' && dropoffAddress.trim() !== '';
 
   const handleRequestRide = async () => {
-    // Dummy coordinates — in real app, use Google Maps Geocoding API
-    const dummyPickupCoords = [-0.1257, 51.5085]; // [lng, lat]
+    const dummyPickupCoords = [-0.1257, 51.5085];
     const dummyDropoffCoords = [-0.1426, 51.5010];
 
     const requestData = {
-      passengerId: '645f3b1a9f1b2c0012345672', // replace with actual user ID from auth context
-      driverId: null, 
+      passengerId: '645f3b1a9f1b2c0012345672',
+      driverId: null,
       pickupLocation: {
         type: 'Point',
         coordinates: dummyPickupCoords,
@@ -38,7 +39,7 @@ export default function RideRequestScreen() {
         coordinates: dummyDropoffCoords,
         address: dropoffAddress,
       },
-      fare: 25.75, // You can compute this using Distance Matrix API
+      fare: 25.75,
       status: 'pending',
       paymentMethod: 'credit_card',
       requestedAt: new Date().toISOString(),
@@ -54,12 +55,13 @@ export default function RideRequestScreen() {
         },
         body: JSON.stringify(requestData),
       });
+      
       const result = await response.json();
       console.log('Server response:', result);
 
       if (response.ok && result.message) {
         Alert.alert('Ride Requested ✅', result.message);
-        router.push('/profile-name');
+        pollBookingStatus(); // 🔁 start polling for status updates
       } else {
         Alert.alert('Something went wrong', result.error || 'Please try again.');
       }
@@ -68,6 +70,33 @@ export default function RideRequestScreen() {
       Alert.alert('Network Error', 'Failed to contact server.');
     }
   };
+
+const pollBookingStatus = () => {
+  const interval = setInterval(async () => {
+    try {
+      console.log("about to hit!")
+      const res = await fetch(`http://172.20.10.4:8080/api/booking/status/645f3b1a9f1b2c0012345672`);
+      console.log("hit! :)")
+      
+      if (!res.ok) {
+        console.warn('Backend responded with error, will retry...');
+        return; // do nothing, keep polling
+      }
+
+      const data = await res.json();
+
+      if (data.status === 'accepted') {
+        clearInterval(interval); // stop polling once driver is found
+        setRideStatus('accepted');
+        setDriverInfo(data.driver);
+        Alert.alert('Driver Accepted ✅', 'Your driver is on the way!');
+      }
+    } catch (err) {
+      console.warn('Polling failed, retrying...');
+      // don't stop polling — just continue
+    }
+  }, 2000); // poll every 2 seconds
+};
 
   return (
     <KeyboardAvoidingView
@@ -99,15 +128,32 @@ export default function RideRequestScreen() {
           />
 
           <TouchableOpacity
-            style={[
-              styles.continueButton,
-              !isFormValid && styles.disabledButton,
-            ]}
+            style={[styles.continueButton, !isFormValid && styles.disabledButton]}
             onPress={handleRequestRide}
             disabled={!isFormValid}
           >
             <Text style={styles.continueText}>Request Ride</Text>
           </TouchableOpacity>
+
+          {rideStatus === 'accepted' && (
+            <>
+              <Text style={styles.acceptedText}>
+                ✅ A driver has accepted your ride and is on the way!
+              </Text>
+              {driverInfo && (
+                <View style={styles.driverCard}>
+                  <Text style={styles.driverTitle}>Driver Details</Text>
+                  <Text>Name: {driverInfo.name}</Text>
+                  <Text>Vehicle: {driverInfo.vehicle}</Text>
+                  <Text>Plate: {driverInfo.plate}</Text>
+                  <Text>Phone: {driverInfo.phone}</Text>
+                  <Text style={styles.arrivalNote}>
+                    🚗 Your driver is arriving shortly!
+                  </Text>
+                </View>
+              )}
+            </>
+          )}
         </View>
 
         <Text style={styles.footer}>
@@ -174,6 +220,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  acceptedText: {
+    color: '#228B22',
+    fontWeight: '600',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  driverCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 20,
+    borderColor: '#ddd',
+    borderWidth: 1,
+  },
+  driverTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  arrivalNote: {
+    marginTop: 10,
+    fontStyle: 'italic',
+    color: '#228B22',
   },
   footer: {
     fontSize: 12,
