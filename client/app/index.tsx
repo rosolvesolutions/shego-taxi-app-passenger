@@ -77,6 +77,15 @@ export default function UserSelectionPage() {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.middleSection}>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => router.push('/log-in')}
+        >
+          <Text style={styles.startText}>Login</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           By continuing, you agree to our Terms & Conditions and Privacy Policy.

@@ -25,6 +25,7 @@ export default function ProfileNameScreen() {
   const [firstName, setFirstName] = useState(paramFirstName);
   const [lastName, setLastName] = useState(paramLastName);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const phoneNumber = paramPhoneNumber;
 
   const isValidEmail = (email: string) =>
@@ -33,14 +34,21 @@ export default function ProfileNameScreen() {
   const isFormValid =
     firstName.trim() !== '' &&
     lastName.trim() !== '' &&
-    isValidEmail(email);
+    isValidEmail(email) &&
+    password.trim().length >= 6;
 
   const handleContinue = async () => {
+    if (password.trim().length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
+
     const userData = {
       firstName,
       lastName,
       email,
       phoneNumber,
+      password,
     };
 
     try {
@@ -76,7 +84,10 @@ export default function ProfileNameScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.wrapper}>
             <Text style={styles.heading}>Welcome to SheGo 🎉</Text>
             <Text style={styles.subheading}>
@@ -109,8 +120,20 @@ export default function ProfileNameScreen() {
               autoCapitalize="none"
             />
 
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter a password 6 character at least"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={true}
+            />
+
             <TouchableOpacity
-              style={[styles.continueButton, !isFormValid && styles.disabledButton]}
+              style={[
+                styles.continueButton,
+                !isFormValid && styles.disabledButton,
+              ]}
               onPress={handleContinue}
               disabled={!isFormValid}
             >
