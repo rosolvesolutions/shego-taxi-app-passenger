@@ -32,7 +32,8 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.post('/login', async (req: any, res: any) => {
+// @ts-ignore
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
