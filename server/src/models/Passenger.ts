@@ -5,6 +5,7 @@ const passengerSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   email: String,
+  password: String,
   pfp: String,
   createdAt: Date,
   updatedAt: Date,

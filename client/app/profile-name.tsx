@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   View,
+  SafeAreaView,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
@@ -24,6 +25,7 @@ export default function ProfileNameScreen() {
   const [firstName, setFirstName] = useState(paramFirstName);
   const [lastName, setLastName] = useState(paramLastName);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const phoneNumber = paramPhoneNumber;
 
   const isValidEmail = (email: string) =>
@@ -32,22 +34,27 @@ export default function ProfileNameScreen() {
   const isFormValid =
     firstName.trim() !== '' &&
     lastName.trim() !== '' &&
-    isValidEmail(email);
+    isValidEmail(email) &&
+    password.trim().length >= 6;
 
   const handleContinue = async () => {
+    if (password.trim().length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
+
     const userData = {
       firstName,
       lastName,
       email,
       phoneNumber,
+      password,
     };
 
     try {
       const response = await fetch(`${API_URL}/api/passenger/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       });
 
@@ -67,97 +74,107 @@ export default function ProfileNameScreen() {
       console.warn('⚠️ Failed to send to backend. Proceeding anyway.');
     }
 
-    router.push({
-      pathname: '/profile-verification',
-      params: {
-        userData: JSON.stringify(userData),
-      },
-    });
+    router.push('/request-ride');
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.wrapper}>
-          <Text style={styles.heading}>Welcome to SheGo 🎉</Text>
-          <Text style={styles.subheading}>
-            Please enter your details to complete your profile.
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FCEEF1' }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.wrapper}>
+            <Text style={styles.heading}>Welcome to SheGo 🎉</Text>
+            <Text style={styles.subheading}>
+              Please enter your details to complete your profile.
+            </Text>
+
+            <Text style={styles.label}>First name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Jane"
+              value={firstName}
+              onChangeText={setFirstName}
+            />
+
+            <Text style={styles.label}>Last name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Doe"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+
+            <Text style={styles.label}>Email (Gmail only)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="example@gmail.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter a password 6 character at least"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={true}
+            />
+
+            <TouchableOpacity
+              style={[
+                styles.continueButton,
+                !isFormValid && styles.disabledButton,
+              ]}
+              onPress={handleContinue}
+              disabled={!isFormValid}
+            >
+              <Text style={styles.continueText}>Continue</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.footer}>
+            All personal data is processed in line with GDPR and privacy best
+            practices. By continuing, you agree to our Terms and Privacy Policy.
           </Text>
-
-          <Text style={styles.label}>First name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Jane"
-            value={firstName}
-            onChangeText={setFirstName}
-          />
-
-          <Text style={styles.label}>Last name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Doe"
-            value={lastName}
-            onChangeText={setLastName}
-          />
-
-          <Text style={styles.label}>Email (Gmail only)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="example@gmail.com"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          <TouchableOpacity
-            style={[
-              styles.continueButton,
-              !isFormValid && styles.disabledButton,
-            ]}
-            onPress={handleContinue}
-            disabled={!isFormValid}
-          >
-            <Text style={styles.continueText}>Continue</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.footer}>
-          All personal data is processed in line with GDPR and privacy best
-          practices. By continuing, you agree to our Terms and Privacy Policy.
-        </Text>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FCEEF1',
     justifyContent: 'center',
     paddingHorizontal: 24,
     paddingBottom: 40,
   },
   wrapper: {
-    paddingTop: 40,
+    paddingTop: 60,
   },
   heading: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 8,
-    color: '#222',
+    color: '#982F46',
   },
   subheading: {
     fontSize: 14,
     textAlign: 'center',
-    color: '#555',
+    color: '#6D2A39',
     marginBottom: 30,
+    paddingHorizontal: 10,
   },
   label: {
     fontSize: 14,
@@ -166,19 +183,22 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   input: {
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     fontSize: 16,
     color: '#000',
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
   continueButton: {
     marginTop: 32,
-    backgroundColor: '#C73A53',
+    backgroundColor: '#982F46',
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 30,
     alignItems: 'center',
+    width: '100%',
   },
   disabledButton: {
     backgroundColor: '#ccc',

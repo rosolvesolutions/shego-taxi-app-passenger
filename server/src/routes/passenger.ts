@@ -1,36 +1,59 @@
-import express from 'express'
-import Passenger from '../models/Passenger'
+// src/routes/passenger.ts
 
-const router = express.Router()
+import express from 'express';
+import bcrypt from 'bcrypt';
+import Passenger from '../models/Passenger';
+
+const router = express.Router();
 
 router.post('/register', async (req, res) => {
-  console.log(req.body);
+  const { phoneNumber, firstName, lastName, email, password } = req.body;
+
   try {
-    const {
-      phoneNumber,
-      firstName,
-      lastName,
-      email,
-    } = req.body
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newPassenger = new Passenger({
       phoneNumber,
       firstName,
       lastName,
       email,
-      pfp: "None",
+      password: hashedPassword,
+      pfp: 'None',
       createdAt: new Date(),
       updatedAt: new Date(),
-      rating: 5, // or whatever default you want
-    })
+      rating: 5,
+    });
 
-    await newPassenger.save()
-
-    res.status(201).json({ message: 'Passenger registered successfully' })
+    await newPassenger.save();
+    res.status(201).json({ message: 'Passenger registered successfully' });
   } catch (err) {
-    console.error('❌ Registration Error:', err)
-    res.status(500).json({ error: 'Failed to register passenger' })
+    console.error('❌ Registration Error:', err);
+    res.status(500).json({ error: 'Failed to register passenger' });
   }
-})
+});
 
-export default router
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await Passenger.findOne({ email });
+    if (!user || !user.password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    return res.status(200).json({ message: 'Login successful', userId: user._id });
+  } catch (err) {
+    console.error('❌ Login Error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ✅ This is the only thing you export:
+export default router;

@@ -28,18 +28,33 @@ export default function UserSelectionPage() {
     fetchValue();
   }, []);
 
+  const ProgressDots = () => (
+    <View style={styles.progressContainer}>
+      <View style={styles.progressGroup}>
+        {[1, 2, 3].map((step) => (
+          <React.Fragment key={step}>
+            <View style={step === 1 ? styles.activeDot : styles.inactiveDot}>
+              <Text style={styles.dotText}>{step}</Text>
+            </View>
+            {step < 3 && <View style={styles.dotLine} />}
+          </React.Fragment>
+        ))}
+      </View>
+      <Text style={styles.stepText}>Step 1 of 3</Text>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top Section */}
-      <View style={styles.topSection}>
-        <View style={styles.logoPlaceholder}>
-          <Text style={styles.logoText}>SheGo</Text>
-        </View>
-        <Text style={styles.heading}>Welcome to SheGo</Text>
-        <Text style={styles.subheading}>Your safe and empowering ride awaits.</Text>
+      <ProgressDots />
+
+      <View style={styles.logoWrapper}>
+        <Text style={styles.logoText}>SheGo</Text>
       </View>
 
-      {/* Start Button */}
+      <Text style={styles.heading}>Welcome to SheGo</Text>
+      <Text style={styles.subheading}>Your safe and empowering ride awaits.</Text>
+
       <View style={styles.middleSection}>
         <TouchableOpacity
           style={styles.startButton}
@@ -53,7 +68,24 @@ export default function UserSelectionPage() {
         )}
       </View>
 
-      {/* Footer */}
+      <View style={styles.middleSection}>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => router.push('/request-ride')}
+        >
+          <Text style={styles.startText}>Book Ride</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.middleSection}>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => router.push('/log-in')}
+        >
+          <Text style={styles.startText}>Login</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           By continuing, you agree to our Terms & Conditions and Privacy Policy.
@@ -67,49 +99,97 @@ export default function UserSelectionPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FCEEF1',
+    paddingHorizontal: 24,
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
-  topSection: {
-    paddingTop: 60,
+  progressContainer: {
+    alignItems: 'center',
+    marginTop: 50,
+    marginBottom: 10,
+  },
+  progressGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  activeDot: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#982F46',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  logoPlaceholder: {
+  inactiveDot: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#E2E2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dotText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  dotLine: {
+    width: 20,
+    height: 2,
+    backgroundColor: '#ccc',
+    marginHorizontal: 4,
+  },
+  stepText: {
+    fontSize: 13,
+    color: '#982F46',
+    fontWeight: '500',
+  },
+  logoWrapper: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: '#D3D3D3',
+    backgroundColor: '#F7D5DD',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
   logoText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#9E2A45',
+    color: '#982F46',
   },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    color: '#982F46',
+    textAlign: 'center',
+    marginTop: 16,
   },
   subheading: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 20,
+    fontSize: 15,
+    color: '#6D2A39',
     textAlign: 'center',
-    paddingHorizontal: 30,
+    marginTop: 8,
+    marginBottom: 30,
+    paddingHorizontal: 10,
   },
   middleSection: {
     alignItems: 'center',
+    width: '100%',
   },
   startButton: {
-    backgroundColor: '#C73A53',
+    backgroundColor: '#982F46',
     paddingVertical: 16,
     paddingHorizontal: 60,
     borderRadius: 30,
     marginBottom: 12,
+    width: '100%',
+    alignItems: 'center',
   },
   startText: {
     color: '#fff',
@@ -126,7 +206,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 24,
-    backgroundColor: '#f9f9f9',
     borderTopWidth: 1,
     borderTopColor: '#eee',
   },
