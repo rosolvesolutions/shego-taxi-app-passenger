@@ -32,6 +32,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -47,10 +48,10 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    res.status(200).json({ message: 'Login successful', userId: user._id });
+    return res.status(200).json({ message: 'Login successful', userId: user._id });
   } catch (err) {
     console.error('❌ Login Error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 

@@ -24,9 +24,9 @@ app.get('/api/value', (req, res) => {
 })
 
 // Driver registration routes
-app.use('/api/passenger', passengerRoutes)
+app.use('/api/passenger', passengerRoutes);
 
-app.use('/api/vision', visionRoutes)
+app.use('/api/vision', visionRoutes);
 
 app.use('/api/booking', bookingRoutes);
 
