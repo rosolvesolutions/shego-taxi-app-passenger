@@ -8,8 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --passWithNoTests",
-    "build": "expo export",
-    "build:native": "expo run:android"
+    "build": "expo export"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",

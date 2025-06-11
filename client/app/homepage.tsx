@@ -4,9 +4,28 @@ import { router } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, SafeAreaView, TextInput, Alert } from 'react-native'; 
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Animated, Pressable } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { GOOGLE_MAPS_API_KEY } from '@env';
+
+// Conditional imports for native platforms only
+let MapView: any = null;
+let Marker: any = null;
+let PROVIDER_GOOGLE: any = null;
+
+if (Platform.OS !== 'web') {
+  const Maps = require('react-native-maps');
+  MapView = Maps.default;
+  Marker = Maps.Marker;
+  PROVIDER_GOOGLE = Maps.PROVIDER_GOOGLE;
+}
+
+// Default location (you can adjust this to your preferred default)
+const DEFAULT_LOCATION = {
+  latitude: 37.78825,
+  longitude: -122.4324,
+  latitudeDelta: 0.005,
+  longitudeDelta: 0.005,
+};
 
 // Home page screen
 export default function HomePage() {
@@ -14,7 +33,7 @@ export default function HomePage() {
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   // errorMsg variable was deleted to pass lint error
   const [, setErrorMsg] = useState<string | null>(null);
-  const mapRef = useRef<MapView | null>(null);
+  const mapRef = useRef<any>(null); // Changed from MapView to any
 
   // Where to button
   const [searchActive, setSearchActive] = useState(false);
@@ -77,6 +96,12 @@ export default function HomePage() {
 
   // Setup location tracking with improved implementation from App.js
   useEffect(() => {
+    // Skip location tracking on web
+    if (Platform.OS === 'web') {
+      console.log("Location tracking skipped on web platform");
+      return;
+    }
+
     let locationSubscription: Location.LocationSubscription | null = null;
 
     const getLocationPermission = async () => {
@@ -138,10 +163,10 @@ export default function HomePage() {
           }
         );
 
-      } catch (error: unknown) {
+      } catch (error: any) {
         console.error("Error getting location:", error);
         setErrorMsg(`Error getting location: ${error}`);
-        Alert.alert("Location Error", error.message);
+        Alert.alert("Location Error", error.message || "Unknown error occurred");
       }
     };
 
@@ -177,17 +202,17 @@ export default function HomePage() {
 
       {/* Live location-tracking map using Expo Location and react-native-maps */}
       <View style={{ flex: 1, minHeight: 300 }}>
-        {Platform.OS !== 'web' ? (
+        {Platform.OS !== 'web' && MapView ? (
           <MapView
             ref={mapRef}
             style={{ flex: 1 }}
             provider={PROVIDER_GOOGLE}
-            initialRegion={{
+            initialRegion={location ? {
               latitude: location.latitude,
               longitude: location.longitude,
               latitudeDelta: 0.005,
               longitudeDelta: 0.005,
-            }}
+            } : DEFAULT_LOCATION}
             showsUserLocation={true}
             followsUserLocation={false}  // Changed to false to allow manual interaction
             // Interaction props:
@@ -201,29 +226,34 @@ export default function HomePage() {
             showsMyLocationButton={false} // We have our own recenter button
             mapType='standard'
           >
-            <Marker
-              coordinate={{
-                latitude: location.latitude,
-                longitude: location.longitude,
-              }}
-              title="You are here"
-              description="Current location"
-            />
+            {location && (
+              <Marker
+                coordinate={{
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                }}
+                title="You are here"
+                description="Current location"
+              />
+            )}
           </MapView>
         ) : (
           <View style={styles.placeholder}>
-            <Text>Fetching current location...</Text>
+            <Text style={styles.placeholderText}>Map view is not available on web</Text>
+            <Text style={styles.placeholderSubtext}>Please use the mobile app for map features</Text>
           </View>
         )}
       </View>
 
-      {/* Recenter Button */}
-      <TouchableOpacity 
-        style={styles.recenterButton} 
-        onPress={recenterMap}
-      >
-        <Ionicons name="locate" size={24} color="#fff" />
-      </TouchableOpacity>
+      {/* Recenter Button - Only show on native platforms */}
+      {Platform.OS !== 'web' && location && (
+        <TouchableOpacity 
+          style={styles.recenterButton} 
+          onPress={recenterMap}
+        >
+          <Ionicons name="locate" size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
 
       {/* Greeting */}
       <View style={styles.greetingContainer}>
@@ -379,6 +409,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  placeholderText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  placeholderSubtext: {
+    color: '#999',
+    fontSize: 14,
+    marginTop: 10,
   },
   menuBackdrop: {
     ...StyleSheet.absoluteFillObject,
