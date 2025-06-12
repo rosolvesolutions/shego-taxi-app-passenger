@@ -6,6 +6,9 @@ import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Animated, Pressable } from 'react-native';
 import * as Location from 'expo-location';
 import { GOOGLE_MAPS_API_KEY } from '@env';
+import type { MapView as MapViewType } from 'react-native-maps';
+import * as Maps from 'react-native-maps';
+
 
 // Conditional imports for native platforms only
 let MapView: any = null;
@@ -13,7 +16,6 @@ let Marker: any = null;
 let PROVIDER_GOOGLE: any = null;
 
 if (Platform.OS !== 'web') {
-  const Maps = require('react-native-maps');
   MapView = Maps.default;
   Marker = Maps.Marker;
   PROVIDER_GOOGLE = Maps.PROVIDER_GOOGLE;
@@ -33,7 +35,7 @@ export default function HomePage() {
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   // errorMsg variable was deleted to pass lint error
   const [, setErrorMsg] = useState<string | null>(null);
-  const mapRef = useRef<any>(null); // Changed from MapView to any
+  const mapRef = useRef<MapViewType | null>(null);
 
   // Where to button
   const [searchActive, setSearchActive] = useState(false);
@@ -163,10 +165,15 @@ export default function HomePage() {
           }
         );
 
-      } catch (error: any) {
-        console.error("Error getting location:", error);
-        setErrorMsg(`Error getting location: ${error}`);
-        Alert.alert("Location Error", error.message || "Unknown error occurred");
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error("Error getting location:", error);
+          setErrorMsg(`Error getting location: ${error.message}`);
+          Alert.alert("Location Error", error.message);
+        } else {
+          console.error("Unknown error", error);
+          Alert.alert("Location Error", "An unknown error occurred");
+        }
       }
     };
 
