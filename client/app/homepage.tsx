@@ -11,9 +11,9 @@ import * as Maps from 'react-native-maps';
 
 
 // Conditional imports for native platforms only
-let MapView: any = null;
-let Marker: any = null;
-let PROVIDER_GOOGLE: any = null;
+let MapView: typeof Maps.default | null = null;
+let Marker: typeof Maps.Marker | null = null;
+let PROVIDER_GOOGLE: typeof Maps.PROVIDER_GOOGLE | null = null;
 
 if (Platform.OS !== 'web') {
   MapView = Maps.default;
