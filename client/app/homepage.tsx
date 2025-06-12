@@ -6,20 +6,53 @@ import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Animated, Pressable } from 'react-native';
 import * as Location from 'expo-location';
 import { GOOGLE_MAPS_API_KEY } from '@env';
-import type { MapView as MapViewType } from 'react-native-maps';
-import * as Maps from 'react-native-maps';
 
-
-// Conditional imports for native platforms only
-let MapView: typeof Maps.default | null = null;
-let Marker: typeof Maps.Marker | null = null;
-let PROVIDER_GOOGLE: typeof Maps.PROVIDER_GOOGLE | null = null;
-
-if (Platform.OS !== 'web') {
-  MapView = Maps.default;
-  Marker = Maps.Marker;
-  PROVIDER_GOOGLE = Maps.PROVIDER_GOOGLE;
+// Type definitions for react-native-maps components
+interface MapViewProps {
+  style?: object;
+  provider?: string;
+  initialRegion?: {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  };
+  showsUserLocation?: boolean;
+  followsUserLocation?: boolean;
+  scrollEnabled?: boolean;
+  zoomEnabled?: boolean;
+  pitchEnabled?: boolean;
+  rotateEnabled?: boolean;
+  zoomTapEnabled?: boolean;
+  zoomControlEnabled?: boolean;
+  showsCompass?: boolean;
+  showsMyLocationButton?: boolean;
+  mapType?: 'standard' | 'satellite' | 'hybrid' | 'terrain';
+  children?: React.ReactNode;
 }
+
+interface MarkerProps {
+  coordinate: {
+    latitude: number;
+    longitude: number;
+  };
+  title?: string;
+  description?: string;
+}
+
+interface MapViewMethods {
+  animateToRegion: (region: {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  }, duration?: number) => void;
+}
+
+type MapViewComponent = React.ComponentType<MapViewProps> & {
+  prototype: MapViewMethods;
+};
+type MarkerComponent = React.ComponentType<MarkerProps>;
 
 // Default location (you can adjust this to your preferred default)
 const DEFAULT_LOCATION = {
@@ -31,19 +64,33 @@ const DEFAULT_LOCATION = {
 
 // Home page screen
 export default function HomePage() {
+  // Map components state
+  const [MapView, setMapView] = useState<MapViewComponent | null>(null);
+  const [Marker, setMarker] = useState<MarkerComponent | null>(null);
+  const [PROVIDER_GOOGLE, setProviderGoogle] = useState<string | null>(null);
+  
   // Map and location state
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   // errorMsg variable was deleted to pass lint error
   const [, setErrorMsg] = useState<string | null>(null);
-  const mapRef = useRef<MapViewType | null>(null);
-
-  // Where to button
-  const [searchActive, setSearchActive] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const mapRef = useRef<MapViewMethods | null>(null);
 
   //Toggle Menu 
   const [menuVisible, setMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-250)).current; // start off-screen
+
+  // Load map components dynamically on native platforms
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      import('react-native-maps').then((Maps) => {
+        setMapView(() => Maps.default as MapViewComponent);
+        setMarker(() => Maps.Marker as MarkerComponent);
+        setProviderGoogle(() => Maps.PROVIDER_GOOGLE as string);
+      }).catch((error) => {
+        console.error('Failed to load react-native-maps:', error);
+      });
+    }
+  }, []);
 
   // Add this in your component (remove after testing)
   useEffect(() => {
@@ -76,17 +123,9 @@ export default function HomePage() {
       setMenuVisible(false);
     });
   };
-  
-  // Searchbar
-  const handleSearch = (query: string) => {
-    console.log('User searched:', query);
-    setSearchActive(false);
-    setSearchText('');
-  };
 
   // User greeting
   const [greeting, setGreeting] = useState('');
-  const userName = 'Midas'; // Replace with dynamic value later
 
   // Set greeting based on time of day
   useEffect(() => {
@@ -198,10 +237,6 @@ export default function HomePage() {
       }, 1000);
     }
   };
-  
-  // Location options for search
-  const recentPlaces = ['📍 123 Oxford Street', '📍 Home', '📍 Starbucks - Camden'];
-  const smartSuggestions = ['🏢 Work', '🏋️ Gym', '🛒 Grocery Store'];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -209,11 +244,11 @@ export default function HomePage() {
 
       {/* Live location-tracking map using Expo Location and react-native-maps */}
       <View style={{ flex: 1, minHeight: 300 }}>
-        {Platform.OS !== 'web' && MapView ? (
+        {Platform.OS !== 'web' && MapView && Marker ? (
           <MapView
             ref={mapRef}
             style={{ flex: 1 }}
-            provider={PROVIDER_GOOGLE}
+            provider={PROVIDER_GOOGLE || undefined}
             initialRegion={location ? {
               latitude: location.latitude,
               longitude: location.longitude,
@@ -262,13 +297,6 @@ export default function HomePage() {
         </TouchableOpacity>
       )}
 
-      {/* Greeting */}
-      <View style={styles.greetingContainer}>
-        <Text style={styles.greetingText}>
-          {greeting}, {userName} <Text style={{ fontSize: 20 }}>👋</Text>
-        </Text>
-      </View>
-
       {/* Top-left hamburger menu icon */}
       <TouchableOpacity style={styles.menuButton} onPress={openMenu}>
         <FontAwesome5 name="bars" size={20} color="#fff" />
@@ -278,51 +306,9 @@ export default function HomePage() {
       <View style={styles.overlay} pointerEvents='none' />
 
       {/* Centered "Where to?" button */}
-      {!searchActive ? (
-        <TouchableOpacity style={styles.whereToButton} onPress={() => setSearchActive(true)}>
-          <Text style={styles.whereToText}>Where to?</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.searchBarContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search destination..."
-            placeholderTextColor="#ccc"
-            value={searchText}
-            onChangeText={setSearchText}
-            onSubmitEditing={() => handleSearch(searchText)}
-            autoFocus
-          />
-          <TouchableOpacity onPress={() => {
-            setSearchText('');
-            setSearchActive(false);
-          }}>
-            <Ionicons name="close-circle" size={22} color="#fff" style={styles.clearIcon} />
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Suggestions List */}
-      {searchActive && (
-        <View style={styles.suggestionsContainer}>
-          {searchText === '' && (
-            <>
-              <Text style={styles.suggestionHeading}>Recent</Text>
-              {recentPlaces.map((place, index) => (
-                <TouchableOpacity key={index} style={styles.suggestionItem}>
-                  <Text style={styles.suggestionText}>{place}</Text>
-                </TouchableOpacity>
-              ))}
-              <Text style={styles.suggestionHeading}>Suggestions</Text>
-              {smartSuggestions.map((place, index) => (
-                <TouchableOpacity key={index} style={styles.suggestionItem}>
-                  <Text style={styles.suggestionText}>{place}</Text>
-                </TouchableOpacity>
-              ))}
-            </>
-          )}
-        </View>
-      )}
+      <TouchableOpacity style={styles.whereToButton} onPress={() => router.push('/request-ride')}>
+        <Text style={styles.whereToText}>Where to?</Text>
+      </TouchableOpacity>
 
       {/* Bottom navigation bar with icons */}
       <View style={styles.bottomNav}>
@@ -378,18 +364,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  mapImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    opacity: 0.95,
-  },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.25)',
-    pointerEvents: 'none',
   },
   menuButton: {
     position: 'absolute',
@@ -472,12 +449,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  greetingSub: {
-    fontSize: 14,
-    color: '#f0e0e0',
-    marginTop: 4,
-    fontStyle: 'italic',
-  },
   whereToButton: {
     position: 'absolute',
     bottom: 100,
@@ -497,94 +468,6 @@ const styles = StyleSheet.create({
     fontSize: 21,
     fontWeight: '700',
     letterSpacing: 1.2,
-  },
-  searchBarContainer: {
-    position: 'absolute',
-    top: '42%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(92,26,39,0.9)',
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    alignSelf: 'center',
-    width: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#fff',
-    paddingVertical: 2,
-  },
-  suggestionsContainer: {
-    position: 'absolute',
-    top: '52%',
-    alignSelf: 'center',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    width: '80%',
-    borderRadius: 12,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
-    zIndex: 50,
-  },
-  quickActionsContainer: {
-    position: 'absolute',
-    top: '65%',
-    alignSelf: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    width: '90%',
-    gap: 10,
-  },
-  quickCard: {
-    backgroundColor: 'rgba(92,26,39,0.9)',
-    width: '47%',
-    paddingVertical: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  quickEmoji: {
-    fontSize: 24,
-    marginBottom: 6,
-  },
-  quickLabel: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  suggestionHeading: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6,
-  },
-  suggestionItem: {
-    paddingVertical: 6,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
-  },
-  suggestionText: {
-    fontSize: 15,
-    color: '#444',
-  },
-  clearIcon: {
-    marginLeft: 10,
   },
   bottomNav: {
     position: 'absolute',
