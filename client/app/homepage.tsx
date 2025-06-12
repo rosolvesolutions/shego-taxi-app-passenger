@@ -1,7 +1,7 @@
 // client/app/homepage.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { router } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, SafeAreaView, TextInput, Alert } from 'react-native'; 
+import { View, Text, StyleSheet, TouchableOpacity, Platform, SafeAreaView, Alert } from 'react-native'; //removed TextInput to pass lint test
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Animated, Pressable } from 'react-native';
 import * as Location from 'expo-location';
@@ -123,9 +123,6 @@ export default function HomePage() {
       setMenuVisible(false);
     });
   };
-
-  // User greeting
-  const [greeting, setGreeting] = useState('');
 
   // Set greeting based on time of day
   useEffect(() => {
