@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 // src/routes/passenger.ts
-
 import express from 'express';
 import bcrypt from 'bcrypt';
 import Passenger from '../models/Passenger';
@@ -14,25 +12,10 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newPassenger = new Passenger({
-=======
-import express from 'express'
-import Passenger from '../models/Passenger'
-
-const router = express.Router()
-
-// Simple numeric ID counter (replace with a real counter in production)
-let nextPassengerId = 1
-
-router.post('/register', async (req, res) => {
-  console.log(req.body);
-  try {
-    const {
->>>>>>> e5860c7 (Add all project files - needs restructuring)
       phoneNumber,
       firstName,
       lastName,
       email,
-<<<<<<< HEAD
       password: hashedPassword,
       pfp: 'None',
       createdAt: new Date(),
@@ -73,29 +56,3 @@ router.post('/login', async (req, res) => {
 
 // ✅ This is the only thing you export:
 export default router;
-=======
-    } = req.body
-
-    const newPassenger = new Passenger({
-      _id: nextPassengerId++, // Numeric ID instead of ObjectId
-      phoneNumber,
-      firstName,
-      lastName,
-      email,
-      pfp: "None",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      rating: 5, // or whatever default you want
-    })
-
-    await newPassenger.save()
-
-    res.status(201).json({ message: 'Passenger registered successfully' })
-  } catch (err) {
-    console.error('❌ Registration Error:', err)
-    res.status(500).json({ error: 'Failed to register passenger' })
-  }
-})
-
-export default router
->>>>>>> e5860c7 (Add all project files - needs restructuring)

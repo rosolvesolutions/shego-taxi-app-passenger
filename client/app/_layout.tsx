@@ -1,16 +1,6 @@
 // app/_layout.tsx
-import { Slot } from 'expo-router';
+import { Stack } from "expo-router";
 
 export default function RootLayout() {
-  return (
-    <>
-      <StatusBar style="light" />
-      <Stack 
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: 'transparent' }
-        }}
-      />
-    </>
-  );
+  return <Stack />;
 }

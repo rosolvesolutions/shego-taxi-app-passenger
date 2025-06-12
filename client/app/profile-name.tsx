@@ -74,7 +74,7 @@ export default function ProfileNameScreen() {
       console.warn('⚠️ Failed to send to backend. Proceeding anyway.');
     }
 
-    router.push('/request-ride');
+    router.push('/homepage');
   };
 
   return (
