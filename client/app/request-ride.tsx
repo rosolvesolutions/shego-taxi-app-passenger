@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.4:8080';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.15:8080';
 
 export default function RideRequestScreen() {
   const [pickupAddress, setPickupAddress] = useState('');

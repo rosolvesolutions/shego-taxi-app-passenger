@@ -14,9 +14,9 @@ const app = express()
 const PORT = process.env.EXPRESS_SERVER_PORT || 5001
 
 app.use(cors({ origin: '*' })) // You can allow all origins or restrict to your Expo address
-app.use(express.json()) // Enable JSON body parsing
+app.use(express.json()) // 👈 Enable JSON body parsing
 
-connectDB() // Initialize MongoDB connection
+connectDB() // ✅ Initialize MongoDB connection
 
 // Test endpoint
 app.get('/api/value', (req, res) => {

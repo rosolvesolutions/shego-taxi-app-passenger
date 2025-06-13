@@ -59,7 +59,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        router.replace('/request-ride');
+        router.replace('/homepage');
       } else {
         setError(data.error || 'Login failed. Please try again.');
       }

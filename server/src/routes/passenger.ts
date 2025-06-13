@@ -1,5 +1,4 @@
 // src/routes/passenger.ts
-
 import express from 'express';
 import bcrypt from 'bcrypt';
 import Passenger from '../models/Passenger';

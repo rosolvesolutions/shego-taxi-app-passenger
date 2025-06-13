@@ -2,6 +2,7 @@
     "scripts": {
         "lint": "eslint . --config eslint.config.mjs --max-warnings=0",
         "lint:fix": "eslint . --config eslint.config.mjs --fix",
+        "install:all": "npm install && cd client && npm install && cd ../server && npm install",
         "build": "npm --prefix client run build && npm --prefix server run build"
     },
     "devDependencies": {
@@ -13,7 +14,8 @@
     },
     "name": "shego-taxi-app-driver",
     "version": "1.0.0",
-    "description": "",
+    "private": true,
+    "description": "Monorepo for Shego Taxi App",
     "main": "index.js",
     "repository": {
         "type": "git",
@@ -26,5 +28,12 @@
     "bugs": {
         "url": "https://github.com/rosolvesolutions/shego-taxi-app-driver/issues"
     },
-    "homepage": "https://github.com/rosolvesolutions/shego-taxi-app-driver#readme"
+    "homepage": "https://github.com/rosolvesolutions/shego-taxi-app-driver#readme",
+    "dependencies": {
+        "expo": "^53.0.8"
+    },
+    "workspaces": [
+    "client",
+    "server"
+  ]
 }
